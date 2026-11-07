@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8"></meta>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"></meta>
+    <title>Aplikasi Absensi Selfie & Lokasi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&amp;family=Poppins:wght@600;700&amp;display=swap" rel="stylesheet"></link>
+    <!-- SUPABASE JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        #app-container {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #f8fafc; z-index: 9999999; overflow-y: auto;
+            font-family: 'Quicksand', sans-serif;
+        }
+        body { margin: 0; padding: 0; }
+        .hidden-page { display: none !important; }
+        .loader { border: 4px solid #e2e8f0; border-top: 4px solid #818cf8; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+<style>
+:root{--pine:#1D5B4B;--pine2:#2F7B67;--pine3:#134236;--amber:#F6A623;--amber2:#FFC960;--ink:#12322A;--mut:#66807A;--mint:#E3F0EB}
+#app-container{font-family:'Nunito',sans-serif;color:var(--ink);background:radial-gradient(700px 420px at 0 0,#CFDDB0 0,transparent 65%),radial-gradient(700px 520px at 100% 25%,#9DC5B9 0,transparent 65%),linear-gradient(180deg,#EEF4F1,#E2EBE7)}
+#app-container h1,#app-container h2,#app-container h3,.font-display{font-family:'Poppins','Nunito',sans-serif}
+#main-content,#page-login{background:transparent!important}
+#app-container .rounded-2xl{border-radius:24px}
+#app-container .bg-white.rounded-2xl{border:0;box-shadow:0 12px 30px -14px rgba(19,66,54,.3)}
+#app-container .bg-indigo-400,#app-container .bg-indigo-500{background:linear-gradient(160deg,var(--pine2),var(--pine3))!important;color:#fff}
+#app-container .bg-emerald-400,#app-container .bg-emerald-500,#app-container .bg-amber-400{background:linear-gradient(160deg,#FFC24D,#F39A1C)!important;color:#3A2400!important}
+#app-container .bg-gradient-to-r{background:linear-gradient(145deg,var(--pine2),var(--pine3))!important}
+#app-container .text-indigo-400,#app-container .text-indigo-500,#app-container .text-indigo-600{color:var(--pine)!important}
+#app-container .bg-indigo-50,#app-container .bg-indigo-100{background:var(--mint)!important}
+#app-container .border-indigo-100{border-color:#CFE3DB!important}
+#app-container :is(input,select):focus{--tw-ring-color:rgba(29,91,75,.35)!important;outline:none}
+.loader{border-top-color:var(--amber)!important}
+.card-pine{background:linear-gradient(145deg,var(--pine2),var(--pine3));color:#fff}
+#bottom-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:max(10px,env(safe-area-inset-bottom));width:min(calc(100% - 20px),560px);height:68px;border-radius:30px;background:linear-gradient(180deg,#26705D,#164A3E);box-shadow:0 18px 40px -10px rgba(19,66,54,.55);display:grid;grid-template-columns:1fr 1fr 88px 1fr 1fr;align-items:center;z-index:50}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:rgba(255,255,255,.55);font-size:10.5px;font-weight:700;padding:8px 0}
+.nav-item i{font-size:18px}.nav-item.active{color:#fff}
+.nav-item.active::after{content:'';width:5px;height:5px;border-radius:50%;background:var(--amber)}
+.fab-cell{position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:7px;color:#fff;font-size:10.5px;font-weight:800}
+.nav-fab{position:absolute;top:-30px;width:64px;height:64px;border-radius:50%;background:linear-gradient(160deg,#FFC24D,#F39A1C);color:#fff;font-size:24px;box-shadow:0 0 0 6px rgba(255,255,255,.75),0 10px 22px rgba(232,144,26,.5)}
+.seg{display:flex;background:#DCE8E3;border-radius:16px;padding:4px;gap:4px}
+.seg button{flex:1;padding:8px 4px;border-radius:12px;font-weight:800;font-size:13px;color:var(--mut)}
+.seg button.on{background:#fff;color:var(--pine);box-shadow:0 4px 10px -6px rgba(19,66,54,.5)}
+.inp{width:100%;border:1px solid #D5E3DD;border-radius:12px;padding:8px 12px;font-size:14px;background:#fff}
+.lbl{display:block;font-size:11px;font-weight:800;color:var(--mut);margin:0 0 4px 2px}
+.btn{padding:9px 14px;border-radius:12px;font-weight:800;font-size:13px}
+.row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:#fff;box-shadow:0 8px 20px -14px rgba(19,66,54,.4)}
+.row .mid{flex:1;min-width:0}.row .mid b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.row .mid small{color:var(--mut);font-size:12px;font-weight:600}
+.dchip{width:46px;height:46px;border-radius:14px;background:linear-gradient(160deg,#FFC24D,#F39A1C);color:#3A2400;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0}
+.tm{display:flex;flex-direction:column;align-items:center;min-width:58px;font-size:13px}.tm small{font-size:10px;color:var(--mut);font-weight:700}.tm a{color:var(--pine);margin:0 3px;font-size:12px}
+.bar{height:8px;border-radius:99px;background:#DCE8E3;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--amber),var(--amber2))}
+.pill{padding:3px 10px;border-radius:99px;font-size:12px;font-weight:800;white-space:nowrap}
+.t-ok{color:#1F7A55;background:#DDF3E8}.t-mid{color:#8A5A00;background:#FFF0CF}.t-low{color:#B23B2B;background:#FBE1DC}.t-na{color:var(--mut);background:#E8EFEC}
+.tile{border-radius:18px;background:#fff;padding:12px;text-align:center;box-shadow:0 8px 20px -14px rgba(19,66,54,.4)}.tile b{display:block;font-family:Poppins;font-size:22px}.tile small{color:var(--mut);font-weight:700;font-size:11px}
+.topbar{padding:calc(14px + env(safe-area-inset-top)) 18px 24px;background:linear-gradient(150deg,#2F7B67,#134236);color:#fff;border-radius:0 0 30px 30px;box-shadow:0 14px 30px -16px rgba(19,66,54,.6);position:relative;overflow:hidden}
+.topbar::after{content:'';position:absolute;right:-30px;top:-40px;width:140px;height:140px;border-radius:50%;background:rgba(255,200,96,.18)}
+.topbar-in{display:flex;align-items:center;gap:12px;max-width:736px;margin:0 auto;position:relative;z-index:1}
+.topbar img{width:46px;height:46px;border-radius:15px;background:#fff;padding:5px;object-fit:contain;flex-shrink:0}
+.topbar p{font-size:12px;color:rgba(255,255,255,.78);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topbar h1{font-size:20px;font-weight:700;line-height:1.2;color:#fff}
+.topbar button{margin-left:auto;flex-shrink:0;width:42px;height:42px;border-radius:50%;background:linear-gradient(160deg,#FFC24D,#F39A1C);color:#3A2400;font-weight:800;font-family:Poppins}
+.login-hero{width:100%;padding:calc(48px + env(safe-area-inset-top)) 24px 104px;text-align:center;color:#fff;background:linear-gradient(150deg,#2F7B67,#134236);border-radius:0 0 44px 44px;position:relative;overflow:hidden}
+.login-hero .orb{position:absolute;border-radius:50%;background:rgba(255,200,96,.25)}.login-hero .o1{width:220px;height:220px;right:-70px;top:-80px}.login-hero .o2{width:140px;height:140px;left:-50px;bottom:-40px;background:rgba(255,255,255,.1)}
+.logo-box{position:relative;width:84px;height:84px;margin:0 auto 14px;border-radius:26px;background:#fff;padding:12px;box-shadow:0 14px 28px -12px rgba(0,0,0,.4)}.logo-box img{width:100%;height:100%;object-fit:contain}
+.login-hero h1{position:relative;font-size:26px;font-weight:700;color:#fff}.login-hero p{position:relative;font-size:14px;opacity:.85;margin-top:4px}
+.login-card{width:min(calc(100% - 32px),420px);margin:-64px auto 0;background:#fff;border-radius:28px;padding:26px 22px;box-shadow:0 24px 50px -20px rgba(19,66,54,.5);position:relative}
+.login-card h2{font-size:20px;font-weight:700}.login-card .sub{color:var(--mut);font-size:13px;font-weight:600;margin:2px 0 18px}
+.fld{display:flex;align-items:center;gap:10px;background:#F1F6F4;border:1.5px solid #D5E3DD;border-radius:14px;padding:0 14px;margin-bottom:14px}.fld:focus-within{border-color:var(--pine2);background:#fff}
+.fld i{color:var(--pine2)}.fld input{flex:1;min-width:0;border:0;background:transparent;padding:13px 0;font-size:15px;outline:none;font-family:inherit}.fld button{color:var(--mut)}
+.btn-login{width:100%;padding:14px;border-radius:14px;font-weight:800;font-size:16px;color:#3A2400;background:linear-gradient(160deg,#FFC24D,#F39A1C);box-shadow:0 12px 22px -10px rgba(232,144,26,.7);margin-top:4px}
+.login-foot{margin:20px 0 28px;font-size:12.5px;font-weight:700;color:var(--pine)}
+.clock-card{position:relative;z-index:10;width:100%;margin-top:20px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);backdrop-filter:blur(6px);border-radius:24px;padding:18px 20px;text-align:center}
+@media(min-width:768px){.clock-card{width:auto;min-width:250px;margin-top:0}}
+.clock-time{font-family:Poppins,sans-serif;font-weight:700;font-size:54px;line-height:1;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.clock-time small{font-size:22px;color:#FFC960;margin-left:6px;letter-spacing:0}
+.clock-date{font-size:13px;font-weight:700;opacity:.9;margin:10px 0 12px}
+#kamera-video{transform:scaleX(-1)}
+.empty{border-radius:20px;background:rgba(255,255,255,.7);padding:28px 16px;text-align:center;color:var(--mut);font-weight:700}
+</style>
+</head>
+<body>
+
+    <div style="display: none;">
+        <img alt="Thumbnail Absensi" src="https://www.jagoweb.com/image/media/original/media_2302150023png" />
+    </div>
+
+    <div id="app-container">
+        
+        <div class="fixed inset-0 bg-slate-900 bg-opacity-40 backdrop-blur-sm z-[9999] flex flex-col justify-center items-center text-white hidden-page" id="global-loader">
+            <div class="loader mb-4"></div>
+            <p class="font-semibold text-lg tracking-wide" id="loader-text">Memproses...</p>
+        </div>
+
+        <div class="fixed top-6 right-6 text-white px-6 py-4 rounded-xl shadow-xl transition-all duration-300 transform translate-y-[-100%] opacity-0 pointer-events-none z-[9999]" id="toast">
+            <span class="font-semibold" id="toast-msg">Pesan Notifikasi</span>
+        </div>
+
+        <!-- HALAMAN LOGIN -->
+        <div class="min-h-screen flex flex-col items-center" id="page-login">
+            <div class="login-hero">
+                <span class="orb o1"></span><span class="orb o2"></span>
+                <div class="logo-box"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjitu6G10AWiFNNRl6Nn8VNxA5pI8mclWKt5lm_LHJbN44bJdEdWP_Wr11Km7-CMyi6yjNxfT-AZfByU9HM7IfXgeYXyT0TWe_dax5bDom4BMLvzdvUU0BhCc8g8DiScUYeh6PvXqIXFoDxGTLMkMYonaiACMiGXSgjQKSTOEQE_DASw514dANUwWi-wDek/s320/LOGO%20YAPERI%20NE%20icon.png" alt="Logo STAI Yaperi"></div>
+                <h1>Absensi Mahasiswa</h1>
+                <p>Absen dengan selfie dan lokasi</p>
+            </div>
+            <form class="login-card" id="form-login" onsubmit="handleLogin(event)">
+                <h2>Selamat datang</h2>
+                <p class="sub">Masuk dengan NIM/NPM Anda</p>
+                <label class="lbl" for="login-username">Username</label>
+                <div class="fld"><i class="fa-regular fa-user"></i><input id="login-username" type="text" placeholder="Masukkan username" autocomplete="username" required></div>
+                <label class="lbl" for="login-password">Password</label>
+                <div class="fld"><i class="fa-solid fa-lock"></i><input id="login-password" type="password" placeholder="Masukkan password" autocomplete="current-password" required><button type="button" onclick="togglePw()" aria-label="Tampilkan password"><i class="fa-regular fa-eye" id="pw-eye" style="color:inherit"></i></button></div>
+                <button class="btn-login" type="submit">Masuk</button>
+            </form>
+            <p class="login-foot"><i class="fa-solid fa-calendar-check mr-1"></i> Absensi dibuka setiap Jumat dan Sabtu</p>
+        </div>
+
+        <!-- LAYOUT UTAMA -->
+        <div class="hidden-page min-h-screen flex" id="layout-main">
+            
+            <nav id="bottom-nav" aria-label="Menu utama"></nav>
+
+            <!-- KONTEN HALAMAN -->
+            <div class="flex-1 h-screen overflow-y-auto bg-slate-50 relative" id="main-content">
+                
+                <div class="topbar"><div class="topbar-in"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjitu6G10AWiFNNRl6Nn8VNxA5pI8mclWKt5lm_LHJbN44bJdEdWP_Wr11Km7-CMyi6yjNxfT-AZfByU9HM7IfXgeYXyT0TWe_dax5bDom4BMLvzdvUU0BhCc8g8DiScUYeh6PvXqIXFoDxGTLMkMYonaiACMiGXSgjQKSTOEQE_DASw514dANUwWi-wDek/s320/LOGO%20YAPERI%20NE%20icon.png" alt="Logo"><div class="min-w-0"><p id="topbar-user">Halo</p><h1 id="mobile-header-title">Beranda</h1></div><button id="topbar-av" onclick="navigateTo('page-profile')" aria-label="Akun">A</button></div></div>
+                <div style="height:16px"></div><div class="p-4 pb-40 max-w-3xl mx-auto">
+                    
+                    <!-- ADMIN: DASHBOARD -->
+                    <div class="hidden-page space-y-6" id="page-admin-dashboard">
+                        <div class="bg-gradient-to-r from-indigo-400 to-purple-400 text-white p-8 rounded-2xl shadow-md relative overflow-hidden">
+                            <div class="absolute -right-10 -top-10 text-white opacity-10">
+                                <i class="fa-solid fa-chart-pie text-9xl"></i>
+                            </div>
+                            <h2 class="text-3xl font-bold relative z-10">Hai, <span id="admin-welcome-name">Admin</span> 👋</h2>
+                            <p class="text-indigo-50 mt-2 relative z-10 text-lg">Berikut adalah ringkasan data absensi hari ini.</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+                                <div class="w-14 h-14 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center text-2xl"><i class="fa-solid fa-users"></i></div>
+                                <div>
+                                    <h3 class="text-slate-400 text-xs font-bold uppercase tracking-wider">Total Peserta</h3>
+                                    <p class="text-3xl font-black text-slate-700 mt-1" id="stat-total-peserta">0</p>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+                                <div class="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center text-2xl"><i class="fa-solid fa-calendar-check"></i></div>
+                                <div>
+                                    <h3 class="text-slate-400 text-xs font-bold uppercase tracking-wider">Absen Hari Ini</h3>
+                                    <p class="text-3xl font-black text-slate-700 mt-1" id="stat-absen-today">0</p>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+                                <div class="w-14 h-14 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center text-2xl"><i class="fa-solid fa-history"></i></div>
+                                <div>
+                                    <h3 class="text-slate-400 text-xs font-bold uppercase tracking-wider">Total Riwayat</h3>
+                                    <p class="text-3xl font-black text-slate-700 mt-1" id="stat-total-riwayat">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ADMIN: KELOLA PESERTA -->
+                    <div class="hidden-page space-y-6" id="page-admin-users">
+                        <h2 class="text-2xl font-bold text-slate-800 border-b-2 border-indigo-100 pb-3 inline-block">Kelola Data Peserta</h2>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                            <h3 class="font-bold text-slate-700 mb-4 flex items-center"><i class="fa-solid fa-user-plus text-indigo-400 mr-2"></i> Tambah Peserta Baru</h3>
+                            <form class="grid grid-cols-1 md:grid-cols-4 gap-4" id="form-add-user" onsubmit="handleAddUser(event)">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 mb-1">Nama Lengkap</label>
+                                    <input class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-300 outline-none" id="add-nama" required="" type="text" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 mb-1">Username (Unik)</label>
+                                    <input class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-300 outline-none" id="add-username" required="" type="text" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 mb-1">Password</label>
+                                    <input class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-300 outline-none" id="add-password" required="" type="text" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 mb-1">Tingkat</label>
+                                    <input class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:ring-2 focus:ring-indigo-300 outline-none" id="add-kategori" placeholder="Cth: Semester 3" required="" type="text" />
+                                </div>
+                                <div class="md:col-span-4 mt-2">
+                                    <button class="bg-emerald-400 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-emerald-500 shadow-sm transition-transform transform hover:-translate-y-0.5" type="submit"><i class="fa-solid fa-plus mr-2"></i> Simpan Peserta</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm whitespace-nowrap">
+                                    <thead class="bg-slate-50 text-slate-500 border-b border-slate-100">
+                                        <tr>
+                                            <th class="px-6 py-4 font-bold uppercase tracking-wider text-xs">Nama Lengkap</th>
+                                            <th class="px-6 py-4 font-bold uppercase tracking-wider text-xs">Username</th>
+                                            <th class="px-6 py-4 font-bold uppercase tracking-wider text-xs">Tingkat</th>
+                                            <th class="px-6 py-4 font-bold uppercase tracking-wider text-xs text-center">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100" id="table-users-body">
+                                        <!-- Data users -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AKUN -->
+                    <div class="hidden-page space-y-5" id="page-profile">
+                        <div class="card-pine rounded-2xl p-6 text-center shadow-md">
+                            <div class="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-3xl font-display font-bold" style="background:linear-gradient(160deg,#FFC24D,#F39A1C);color:#3A2400" id="prof-initial">A</div>
+                            <h2 class="mt-3 text-xl font-bold" id="prof-name">Nama</h2>
+                            <p class="text-sm opacity-80" id="prof-role">Role</p>
+                            <p class="inline-block mt-2 pill hidden-page" style="background:rgba(255,255,255,.2)" id="prof-kat"></p>
+                        </div>
+                        <button class="w-full bg-white text-rose-500 font-bold py-3.5 rounded-2xl shadow-sm border border-rose-100" onclick="logout()"><i class="fa-solid fa-sign-out-alt mr-2"></i>Keluar</button>
+                    </div>
+
+                    <!-- REKAP ABSENSI -->
+                    <div class="hidden-page space-y-4" id="page-history">
+                        <div class="bg-white rounded-2xl p-4 space-y-3">
+                            <div class="seg" id="seg-periode">
+                                <button data-t="harian" onclick="setPeriod('harian')">Harian</button>
+                                <button data-t="bulanan" onclick="setPeriod('bulanan')">Bulanan</button>
+                                <button data-t="rentang" onclick="setPeriod('rentang')">Rentang</button>
+                            </div>
+                            <input type="hidden" id="filter-type" value="bulanan">
+                            <div id="filter-date-container" class="hidden-page"><label class="lbl">Tanggal</label><input class="inp" id="filter-date" type="date" onchange="applyFilters()"></div>
+                            <div id="filter-month-container"><label class="lbl">Bulan</label><input class="inp" id="filter-month" type="month" onchange="applyFilters()"></div>
+                            <div id="filter-range-container" class="hidden-page space-y-2">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div><label class="lbl">Dari</label><input class="inp" id="filter-from" type="date" onchange="applyFilters()"></div>
+                                    <div><label class="lbl">Sampai</label><input class="inp" id="filter-to" type="date" onchange="applyFilters()"></div>
+                                </div>
+                                <div class="flex gap-2 flex-wrap">
+                                    <button class="btn bg-indigo-50 text-indigo-600" onclick="quickRange(7)">7 hari</button>
+                                    <button class="btn bg-indigo-50 text-indigo-600" onclick="quickRange(30)">30 hari</button>
+                                    <button class="btn bg-indigo-50 text-indigo-600" onclick="quickRange('lalu')">Bulan lalu</button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div id="admin-filter-kategori-container" class="hidden-page"><label class="lbl">Tingkat</label><select class="inp" id="filter-kategori" onchange="applyFilters()"><option value="">Semua Tingkat</option></select></div>
+                                <div id="mode-container" class="flex items-end"><input type="hidden" id="filter-mode" value="jumsab"><p class="text-xs font-bold" style="color:var(--mut)"><i class="fa-solid fa-calendar-check mr-1"></i> Dihitung hanya hari Jumat dan Sabtu, di luar hari libur.</p></div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="btn bg-rose-50 text-rose-500 border border-rose-100" onclick="resetFilters()" title="Reset filter"><i class="fa-solid fa-eraser"></i></button>
+                                <button class="btn bg-indigo-400 flex-1" onclick="printHistory()"><i class="fa-solid fa-print mr-1"></i> Cetak</button>
+                                <button class="btn bg-emerald-400 flex-1" onclick="loadHistoryData()"><i class="fa-solid fa-sync-alt mr-1"></i> Refresh</button>
+                            </div>
+                        </div>
+                        <div class="seg" id="seg-tab">
+                            <button data-t="persen" onclick="setRekapTab('persen')">Persentase</button>
+                            <button data-t="detail" onclick="setRekapTab('detail')">Detail</button>
+                        </div>
+                        <div id="rekap-persen" class="space-y-3"></div>
+                        <div id="rekap-detail" class="space-y-2 hidden-page"><div id="table-history-body" class="space-y-2"></div></div>
+                    </div>
+
+                    <!-- ADMIN: PENGATURAN LOKASI -->
+                    <div class="hidden-page space-y-6" id="page-admin-settings">
+                        <h2 class="text-2xl font-bold text-slate-800 border-b-2 border-indigo-100 pb-3 inline-block">Pengaturan Titik Pusat Absen</h2>
+                        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 max-w-2xl relative overflow-hidden">
+                            <div class="absolute -right-6 -top-6 text-indigo-50 opacity-50"><i class="fa-solid fa-map-location-dot text-9xl"></i></div>
+                            <p class="text-sm text-slate-500 mb-8 font-medium relative z-10">Tentukan koordinat pusat (Latitude &amp; Longitude) dan batas radius maksimal yang diizinkan untuk peserta melakukan absensi.</p>
+                            
+                            <form class="space-y-5 relative z-10" id="form-settings" onsubmit="handleSaveLocationSettings(event)">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Latitude (Garis Lintang)</label>
+                                        <input class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-300 outline-none bg-slate-50 font-mono text-sm" id="set-lat" placeholder="Contoh: -6.200000" required="" type="text" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Longitude (Garis Bujur)</label>
+                                        <input class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-300 outline-none bg-slate-50 font-mono text-sm" id="set-lng" placeholder="Contoh: 106.816666" required="" type="text" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Batas Radius (Meter)</label>
+                                    <div class="relative w-full md:w-1/2">
+                                        <input class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-300 outline-none bg-slate-50 font-bold" id="set-radius" min="10" placeholder="100" required="" type="number" />
+                                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400 font-bold">m</div>
+                                    </div>
+                                </div>
+                                <div class="pt-6 border-t border-slate-100 flex flex-wrap gap-3">
+                                    <button class="bg-indigo-400 text-white px-6 py-3 rounded-xl hover:bg-indigo-500 font-bold shadow-md transition-transform transform hover:-translate-y-0.5" type="submit"><i class="fa-solid fa-save mr-2"></i> Simpan Pengaturan Lokasi</button>
+                                    <button class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-6 py-3 rounded-xl hover:bg-emerald-100 font-bold transition" onclick="getCurrentLocationForAdmin()" type="button"><i class="fa-solid fa-crosshairs mr-2"></i> Gunakan Lokasi Saat Ini</button>
+                                </div>
+                            </form>
+                        </div>
+                    <div class="bg-white rounded-2xl p-6 max-w-2xl">
+                        <h3 class="font-bold text-slate-700 flex items-center"><i class="fa-solid fa-calendar-xmark text-indigo-400 mr-2"></i> Hari Libur</h3>
+                        <p class="text-sm text-slate-500 mt-1 mb-4">Absensi hanya dibuka Jumat dan Sabtu. Tanggal libur di bawah ditutup untuk absen dan tidak dihitung dalam persentase kehadiran.</p>
+                        <form class="grid grid-cols-2 gap-3" onsubmit="addHoliday(event)">
+                            <div><label class="lbl">Dari</label><input class="inp" type="date" id="libur-from" required></div>
+                            <div><label class="lbl">Sampai (opsional)</label><input class="inp" type="date" id="libur-to"></div>
+                            <div class="col-span-2"><label class="lbl">Keterangan</label><input class="inp" id="libur-ket" placeholder="Cth: Libur Maulid Nabi" required></div>
+                            <div class="col-span-2"><button class="btn bg-emerald-400 w-full" type="submit"><i class="fa-solid fa-plus mr-1"></i> Tambah Hari Libur</button></div>
+                        </form>
+                        <div id="libur-list" class="space-y-2 mt-4"></div>
+                    </div>
+                    </div>
+
+                    <!-- PESERTA: DASHBOARD -->
+                    <div class="hidden-page space-y-6" id="page-user-dashboard">
+                        <div class="bg-gradient-to-r from-emerald-400 to-teal-400 text-white p-8 rounded-2xl shadow-md relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between">
+                            <div class="absolute -right-10 -top-10 text-white opacity-10">
+                                <i class="fa-solid fa-house-user text-9xl"></i>
+                            </div>
+                            <div class="relative z-10">
+                                <h2 class="text-3xl font-bold">Hai, <span id="welcome-name">Peserta</span>! ✨</h2>
+                                <p class="text-emerald-50 mt-2 text-lg">Jangan lupa melakukan absensi kehadiran hari ini.</p>
+                            </div>
+                            <div class="clock-card"><div class="clock-time"><span id="clk-hm">00:00</span><small id="clk-s">00</small></div><div class="clock-date" id="clk-date">-</div><span class="pill t-ok" id="clk-status">-</span></div>
+                        </div>
+                        <div class="card-pine rounded-2xl p-5 flex items-center gap-4 shadow-md">
+                            <div id="user-ring" class="shrink-0" style="width:96px;height:96px"></div>
+                            <div><p class="font-display font-bold text-lg leading-tight">Kehadiran bulan ini</p><p class="text-sm opacity-80 mt-1" id="user-ring-text">Memuat...</p>
+                            <button class="btn mt-3" style="background:#fff;color:var(--pine)" onclick="navigateTo('page-history','persen')">Lihat rekap</button></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+                                <div class="w-14 h-14 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center text-2xl"><i class="fa-solid fa-calendar-alt"></i></div>
+                                <div>
+                                    <h3 class="text-slate-400 text-xs font-bold uppercase tracking-wider">Absen Bulan Ini</h3>
+                                    <p class="text-3xl font-black text-slate-700 mt-1" id="user-stat-bulan">0</p>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+                                <div class="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center text-2xl"><i class="fa-solid fa-sign-in-alt"></i></div>
+                                <div>
+                                    <h3 class="text-slate-400 text-xs font-bold uppercase tracking-wider">Total Masuk</h3>
+                                    <p class="text-3xl font-black text-slate-700 mt-1" id="user-stat-masuk">0</p>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+                                <div class="w-14 h-14 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center text-2xl"><i class="fa-solid fa-sign-out-alt"></i></div>
+                                <div>
+                                    <h3 class="text-slate-400 text-xs font-bold uppercase tracking-wider">Total Pulang</h3>
+                                    <p class="text-3xl font-black text-slate-700 mt-1" id="user-stat-pulang">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PESERTA: FORM ABSENSI (KAMERA & GPS) -->
+                    <div class="hidden-page space-y-6" id="page-user-absen">
+                        <h2 class="text-2xl font-bold text-slate-800 border-b-2 border-indigo-100 pb-3 inline-block">Form Absensi Selfie</h2>
+                        
+                        <div class="hidden-page rounded-2xl p-5 flex items-start gap-3" style="background:#FFF0CF;color:#6B4500" id="absen-closed"><i class="fa-solid fa-calendar-xmark text-2xl"></i><div><strong class="block text-lg">Absensi ditutup</strong><span id="absen-closed-msg"></span></div></div>
+                        <div class="hidden-page bg-emerald-50 border border-emerald-200 p-6 rounded-2xl flex items-start space-x-4" id="absen-lock-message">
+                            <div class="text-emerald-500 text-3xl"><i class="fa-solid fa-check-circle"></i></div>
+                            <div>
+                                <strong class="font-bold text-emerald-800 block text-lg">Selesai!</strong>
+                                <span class="text-emerald-600 font-medium">Anda sudah menyelesaikan absensi (Masuk &amp; Pulang) untuk hari ini. Silakan kembali nanti!</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="absen-form-container">
+                            
+                            <!-- Area Kamera -->
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center">
+                                <h3 class="font-black text-slate-700 mb-4 w-full text-left text-lg flex items-center"><span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm mr-2">1</span> Ambil Selfie</h3>
+                                <div class="relative w-full aspect-video bg-slate-900 rounded-xl overflow-hidden flex items-center justify-center mb-6 shadow-inner">
+                                    <video autoplay="" class="w-full h-full object-cover" id="kamera-video" playsinline=""></video>
+                                    <canvas class="hidden-page" id="kamera-canvas"></canvas>
+                                    <img class="hidden-page w-full h-full object-cover" id="kamera-preview" />
+                                    <div class="absolute inset-0 bg-slate-800 bg-opacity-90 flex flex-col items-center justify-center hidden-page p-4 text-center" id="kamera-error">
+                                        <i class="fa-solid fa-video-slash text-rose-500 text-4xl mb-2"></i>
+                                        <p class="text-white text-sm font-medium">Kamera tidak dapat diakses atau diblokir browser.</p>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-3 w-full">
+                                    <button class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl text-sm hover:bg-slate-200 transition" id="btn-start-cam" onclick="startCamera()"><i class="fa-solid fa-video mr-1"></i> Buka Kamera</button>
+                                    <button class="flex-1 bg-indigo-400 text-white font-bold py-3 rounded-xl text-sm hover:bg-indigo-500 shadow-sm transition transform hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none" disabled="" id="btn-snap" onclick="takeSnapshot()"><i class="fa-solid fa-camera mr-1"></i> Ambil Foto</button>
+                                    <button class="flex-1 bg-amber-400 text-white font-bold py-3 rounded-xl text-sm hover:bg-amber-500 shadow-sm transition transform hover:-translate-y-0.5 hidden-page" id="btn-retake" onclick="retakeSnapshot()"><i class="fa-solid fa-undo mr-1"></i> Ulangi</button>
+                                </div>
+                            </div>
+
+                            <!-- Area Data & Submit -->
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                                <h3 class="font-black text-slate-700 mb-4 w-full text-left text-lg flex items-center"><span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm mr-2">2</span> Verifikasi Lokasi &amp; Kirim</h3>
+                                
+                                <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-slate-100 text-sm space-y-2">
+                                    <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                                        <span class="text-slate-500 font-semibold"><i class="fa-solid fa-location-crosshairs mr-1"></i> Pusat Lokasi</span>
+                                        <span class="font-mono text-[11px] bg-white px-2 py-1 rounded text-slate-500 border border-slate-200" id="gps-target">-</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-slate-500 font-semibold"><i class="fa-solid fa-satellite-dish mr-1"></i> Status GPS</span>
+                                        <span class="font-bold text-amber-500 bg-amber-50 px-2 py-0.5 rounded text-xs" id="gps-status">Mencari... <i class="fa-solid fa-spinner fa-spin ml-1"></i></span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-slate-500 font-semibold"><i class="fa-solid fa-ruler-horizontal mr-1"></i> Jarak ke Pusat</span>
+                                        <span class="font-bold text-slate-700" id="gps-distance">-</span>
+                                    </div>
+                                    <div class="flex justify-between items-center"><span class="text-slate-500 font-semibold"><i class="fa-solid fa-bullseye mr-1"></i> Akurasi GPS</span><span class="font-bold text-slate-700" id="gps-accuracy">-</span></div>
+                                    <p class="hidden-page text-xs text-slate-600 font-medium" id="gps-help"></p>
+                                    <button type="button" class="hidden-page btn w-full bg-indigo-400" id="btn-gps-retry" onclick="startGPS()"><i class="fa-solid fa-rotate mr-1"></i> Cari ulang GPS</button>
+                                    <div class="flex justify-between items-center pt-2 border-t border-slate-200">
+                                        <span class="text-slate-500 font-semibold"><i class="fa-solid fa-circle-notch mr-1"></i> Batas Diizinkan</span>
+                                        <span class="font-bold text-slate-700" id="gps-radius">-</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-6">
+                                    <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Pilih Tipe Absen</label>
+                                    <select class="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 font-bold text-slate-700 focus:ring-2 focus:ring-indigo-300 outline-none transition cursor-pointer" id="absen-tipe">
+                                        <option id="opt-masuk" value="Masuk">Absen Masuk (Datang)</option>
+                                        <option id="opt-pulang" value="Pulang">Absen Pulang (Selesai)</option>
+                                    </select>
+                                    <div class="text-xs text-indigo-500 font-medium mt-2 hidden-page flex items-start" id="absen-tipe-info"><i class="fa-solid fa-info-circle mt-0.5 mr-1"></i> <span></span></div>
+                                </div>
+
+                                <button class="w-full bg-emerald-400 text-white font-bold py-4 px-4 rounded-xl hover:bg-emerald-500 shadow-md transition-all transform hover:-translate-y-0.5 opacity-50 cursor-not-allowed flex justify-center items-center text-lg" disabled="" id="btn-submit-absen" onclick="submitAbsensi()">
+                                    <i class="fa-solid fa-paper-plane mr-2"></i> Kirim Absensi
+                                </button>
+                                <p class="text-xs text-rose-500 font-medium mt-3 text-center bg-rose-50 p-2 rounded-lg border border-rose-100" id="submit-warning"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Silakan ambil foto dan pastikan lokasi sesuai batas radius.</p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- LOGIKA JAVASCRIPT & SUPABASE INTEGRATION -->
+    <script>
+        // INISIALISASI SUPABASE CLIENT
+        const SUPABASE_URL = "https://ybwnqxhluamofcrnkhxq.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlid25xeGhsdWFtb2Zjcm5raHhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk3NDEzMzMsImV4cCI6MjEwNTMxNzMzM30.pUF4sh1qNjCjtMGw5clqieA3Xwi3ggSB5j85Yft9HfY";
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentUser = null;
+        let appSettings = { lat: -6.200000, lng: 106.816666, radius: 100 };
+        let allHistoryCache = []; 
+
+        let currentPhotoBase64 = null;
+        let currentUserLocation = null;
+        let streamKamera = null;
+
+        window.onload = async () => {
+            setInterval(updateClock, 1000);
+
+            // AUTO LOGIN DARI SESSION JIKA ADA
+            try {
+                const savedUser = localStorage.getItem('absen_user');
+                const savedSettings = localStorage.getItem('absen_settings');
+                if (savedUser && savedSettings) {
+                    currentUser = JSON.parse(savedUser);
+                    appSettings = JSON.parse(savedSettings);
+                    setupUserInterface();
+                }
+            } catch(e) {
+                console.error("Session load error", e);
+                localStorage.removeItem('absen_user');
+                localStorage.removeItem('absen_settings');
+            }
+        };
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if(sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden-page');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden-page');
+            }
+        }
+
+        function formatTanggalGas(rawStr) {
+            if (!rawStr) return "-";
+            if (typeof rawStr === 'string' && rawStr.includes('/')) return rawStr;
+            try {
+                const d = new Date(rawStr);
+                if (isNaN(d.getTime())) return rawStr;
+                const dd = String(d.getDate()).padStart(2, '0');
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const yyyy = d.getFullYear();
+                const hh = String(d.getHours()).padStart(2, '0');
+                const mnt = String(d.getMinutes()).padStart(2, '0');
+                const ss = String(d.getSeconds()).padStart(2, '0');
+                return `${dd}/${mm}/${yyyy} ${hh}:${mnt}:${ss}`;
+            } catch(e) { return rawStr; }
+        }
+
+        function getTanggalSaja(rawStr) {
+            const formatted = formatTanggalGas(rawStr);
+            return formatted.split(' ')[0];
+        }
+        
+        function getBulanTahunSaja(rawStr) {
+            const dateParts = getTanggalSaja(rawStr).split('/');
+            if(dateParts.length === 3) return `${dateParts[1]}/${dateParts[2]}`; // MM/YYYY
+            return "-";
+        }
+
+        function getTodayString() {
+            const now = new Date();
+            const dd = String(now.getDate()).padStart(2, '0');
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const yyyy = now.getFullYear();
+            return `${dd}/${mm}/${yyyy}`;
+        }
+
+        function getThisMonthString() {
+            const now = new Date();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const yyyy = now.getFullYear();
+            return `${mm}/${yyyy}`;
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = message;
+            toast.className = `fixed top-6 right-6 text-white px-6 py-4 rounded-xl shadow-xl transition-all duration-300 transform z-[9999] ${isError ? 'bg-rose-500' : 'bg-emerald-500'}`;
+            toast.classList.remove('opacity-0', 'translate-y-[-100%]');
+            setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-[-100%]'); }, 3000);
+        }
+
+        function showLoader(text = 'Memproses...') {
+            document.getElementById('loader-text').innerText = text;
+            document.getElementById('global-loader').classList.remove('hidden-page');
+        }
+
+        function hideLoader() { document.getElementById('global-loader').classList.add('hidden-page'); }
+
+        function navigateTo(pageId) {
+            if (window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('sidebar-overlay').classList.add('hidden-page');
+            }
+
+            const pages = ['page-login', 'page-admin-dashboard', 'page-admin-users', 'page-history', 'page-admin-settings', 'page-user-dashboard', 'page-user-absen'];
+            pages.forEach(p => { const el = document.getElementById(p); if(el) el.classList.add('hidden-page'); });
+
+            document.getElementById(pageId).classList.remove('hidden-page');
+            
+            if (pageId === 'page-login') {
+                document.getElementById('layout-main').classList.add('hidden-page');
+            } else {
+                document.getElementById('layout-main').classList.remove('hidden-page');
+            }
+
+            if (pageId === 'page-admin-dashboard') loadAdminDashboardStats();
+            if (pageId === 'page-user-dashboard') loadUserDashboardStats();
+            if (pageId === 'page-admin-users') loadUsersData();
+            if (pageId === 'page-history') loadHistoryData();
+            if (pageId === 'page-admin-settings') populateLocationSettingsForm();
+            if (pageId === 'page-user-absen') initAbsenForm();
+            if (pageId !== 'page-user-absen') stopCamera();
+
+            const menuLinks = document.querySelectorAll('#nav-menu a');
+            menuLinks.forEach(link => {
+                link.classList.remove('bg-indigo-50', 'text-indigo-600', 'font-bold');
+                link.classList.add('text-slate-600');
+                if(link.getAttribute('onclick').includes(pageId)) {
+                    link.classList.remove('text-slate-600');
+                    link.classList.add('bg-indigo-50', 'text-indigo-600', 'font-bold');
+                }
+            });
+
+            const menuNames = { 'page-admin-dashboard': 'Dashboard', 'page-admin-users': 'Kelola Peserta', 'page-history': 'Rekapan Absensi', 'page-admin-settings': 'Pengaturan Lokasi', 'page-user-dashboard': 'Dashboard', 'page-user-absen': 'Mulai Absen' };
+            if(menuNames[pageId]) document.getElementById('mobile-header-title').innerText = menuNames[pageId];
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const dd = String(now.getDate()).padStart(2, '0');
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const yyyy = now.getFullYear();
+            const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            if(document.getElementById('live-clock')) document.getElementById('live-clock').innerText = `${dd}/${mm}/${yyyy} ${timeString}`;
+        }
+
+        // --- HANDLER LOGIN VIA SUPABASE ---
+        async function handleLogin(e) {
+            e.preventDefault();
+            const userIn = document.getElementById('login-username').value.trim();
+            const passIn = document.getElementById('login-password').value.trim();
+            
+            showLoader('Mencoba Login...');
+            try {
+                const { data, error } = await _supabase
+                    .from('pengguna')
+                    .select('*')
+                    .eq('username', userIn)
+                    .eq('password', passIn)
+                    .maybeSingle();
+
+                if (error || !data) throw new Error('Username atau Password salah.');
+
+                currentUser = data;
+
+                // Ambil Pengaturan Lokasi
+                const { data: setSetting } = await _supabase.from('pengaturan').select('*').eq('id', 1).single();
+                if (setSetting) {
+                    appSettings = {
+                        lat: parseFloat(String(setSetting.lat).replace(/,/g, '.')),
+                        lng: parseFloat(String(setSetting.lng).replace(/,/g, '.')),
+                        radius: parseInt(setSetting.radius)
+                    };
+                }
+
+                localStorage.setItem('absen_user', JSON.stringify(currentUser));
+                localStorage.setItem('absen_settings', JSON.stringify(appSettings));
+
+                setupUserInterface();
+                showToast(`Selamat datang, ${currentUser.nama}`);
+            } catch (error) { 
+                showToast(error.message, true); 
+            } finally { 
+                hideLoader(); 
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            localStorage.removeItem('absen_user');
+            localStorage.removeItem('absen_settings');
+            
+            stopCamera();
+            navigateTo('page-login');
+        }
+
+        function setupUserInterface() {
+            document.getElementById('nav-user-name').innerText = currentUser.nama;
+            document.getElementById('nav-user-role').innerText = currentUser.role === 'admin' ? 'Administrator' : 'mahasiswa';
+            
+            if(currentUser.role !== 'admin' && currentUser.kategori && currentUser.kategori !== '-') {
+                const catEl = document.getElementById('nav-user-kategori');
+                catEl.innerText = `Kategori: ${currentUser.kategori}`;
+                catEl.classList.remove('hidden-page');
+            }
+
+            const menuContainer = document.getElementById('nav-menu');
+            menuContainer.innerHTML = '';
+            
+            const linkClass = "block px-5 py-3.5 rounded-xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors flex items-center space-x-3 mb-1";
+
+            if (currentUser.role === 'admin') {
+                document.getElementById('admin-welcome-name').innerText = currentUser.nama;
+                document.getElementById('admin-filter-kategori-container').classList.remove('hidden-page');
+                menuContainer.innerHTML = `
+                    <a href="#" onclick="navigateTo('page-admin-dashboard')" class="${linkClass}"><i class="fa-solid fa-chart-pie w-5 text-center"></i> <span>Dashboard</span></a>
+                    <a href="#" onclick="navigateTo('page-admin-users')" class="${linkClass}"><i class="fa-solid fa-users w-5 text-center"></i> <span>Kelola Peserta</span></a>
+                    <a href="#" onclick="navigateTo('page-history')" class="${linkClass}"><i class="fa-solid fa-list-check w-5 text-center"></i> <span>Rekapan Absensi</span></a>
+                    <div class="pt-4 pb-2"><p class="px-5 text-xs font-bold text-slate-400 uppercase tracking-wider">Pengaturan</p></div>
+                    <a href="#" onclick="navigateTo('page-admin-settings')" class="${linkClass}"><i class="fa-solid fa-map-location-dot w-5 text-center"></i> <span>Lokasi Absen</span></a>
+                `;
+                navigateTo('page-admin-dashboard');
+            } else {
+                document.getElementById('welcome-name').innerText = currentUser.nama;
+                menuContainer.innerHTML = `
+                    <a href="#" onclick="navigateTo('page-user-dashboard')" class="${linkClass}"><i class="fa-solid fa-house w-5 text-center"></i> <span>Dashboard</span></a>
+                    <a href="#" onclick="navigateTo('page-user-absen')" class="${linkClass}"><i class="fa-solid fa-camera w-5 text-center"></i> <span>Mulai Absen</span></a>
+                    <a href="#" onclick="navigateTo('page-history')" class="${linkClass}"><i class="fa-solid fa-clock-rotate-left w-5 text-center"></i> <span>Riwayat Saya</span></a>
+                `;
+                navigateTo('page-user-dashboard');
+            }
+        }
+
+        async function loadAdminDashboardStats() {
+            try {
+                const { data: users } = await _supabase.from('pengguna').select('*').neq('role', 'admin');
+                const { data: history } = await _supabase.from('riwayat_absen').select('*');
+                
+                document.getElementById('stat-total-peserta').innerText = users ? users.length : 0;
+                document.getElementById('stat-total-riwayat').innerText = history ? history.length : 0;
+                
+                const today = getTodayString();
+                const absenToday = history ? history.filter(h => getTanggalSaja(h.waktu) === today).length : 0;
+                document.getElementById('stat-absen-today').innerText = absenToday;
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadUserDashboardStats() {
+            try {
+                const { data: history } = await _supabase.from('riwayat_absen').select('*').eq('username', currentUser.username);
+                const thisMonth = getThisMonthString();
+                
+                let bulanIni = 0; let tMasuk = 0; let tPulang = 0;
+                if (history) {
+                    history.forEach(h => {
+                        if(h.tipe === 'Masuk') tMasuk++;
+                        if(h.tipe === 'Pulang') tPulang++;
+                        if(getBulanTahunSaja(h.waktu) === thisMonth) bulanIni++;
+                    });
+                }
+
+                document.getElementById('user-stat-bulan').innerText = bulanIni;
+                document.getElementById('user-stat-masuk').innerText = tMasuk;
+                document.getElementById('user-stat-pulang').innerText = tPulang;
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadUsersData() {
+            showLoader('Memuat data...');
+            try {
+                const { data: users, error } = await _supabase.from('pengguna').select('*').neq('role', 'admin');
+                if(error) throw error;
+
+                const tbody = document.getElementById('table-users-body');
+                tbody.innerHTML = '';
+                if(!users || users.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-4 text-center text-slate-400 font-medium">Belum ada peserta terdaftar.</td></tr>`; return;
+                }
+                users.forEach(u => {
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-4 font-semibold text-slate-700">${u.nama}</td>
+                            <td class="px-6 py-4 font-mono text-sm text-slate-500">${u.username}</td>
+                            <td class="px-6 py-4 text-sm"><span class="bg-indigo-50 border border-indigo-100 text-indigo-600 px-3 py-1 rounded-full font-semibold">${u.kategori || '-'}</span></td>
+                            <td class="px-6 py-4 text-center">
+                                <button onclick="deleteUser('${u.username}')" class="text-rose-500 hover:text-white hover:bg-rose-500 bg-rose-50 border border-rose-100 w-8 h-8 rounded-full transition-colors" title="Hapus"><i class="fa-solid fa-trash text-xs"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (e) { showToast('Gagal memuat peserta', true); } finally { hideLoader(); }
+        }
+
+        async function handleAddUser(e) {
+            e.preventDefault();
+            const nama = document.getElementById('add-nama').value;
+            const username = document.getElementById('add-username').value;
+            const password = document.getElementById('add-password').value;
+            const kategori = document.getElementById('add-kategori').value;
+            
+            showLoader('Menyimpan...');
+            try {
+                const { error } = await _supabase.from('pengguna').insert([{ username, password, role: 'mahasiswa', nama, kategori }]);
+                if(error) throw error;
+
+                showToast('Peserta berhasil ditambahkan');
+                document.getElementById('form-add-user').reset();
+                loadUsersData();
+            } catch (e) { showToast(e.message, true); } finally { hideLoader(); }
+        }
+
+        async function deleteUser(username) {
+            if(!confirm(`Hapus pengguna ${username}?`)) return;
+            showLoader('Menghapus...');
+            try {
+                const { error } = await _supabase.from('pengguna').delete().eq('username', username);
+                if(error) throw error;
+                showToast('Peserta Dihapus'); loadUsersData();
+            } catch (e) { showToast('Gagal menghapus', true); } finally { hideLoader(); }
+        }
+
+        function populateLocationSettingsForm() {
+            document.getElementById('set-lat').value = appSettings.lat;
+            document.getElementById('set-lng').value = appSettings.lng;
+            document.getElementById('set-radius').value = appSettings.radius;
+        }
+
+        function getCurrentLocationForAdmin() {
+            if ("geolocation" in navigator) {
+                showToast('Mendapatkan lokasi...');
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    document.getElementById('set-lat').value = pos.coords.latitude;
+                    document.getElementById('set-lng').value = pos.coords.longitude;
+                    showToast('Lokasi disalin!');
+                }, (error) => {
+                    showToast('Gagal mendapat lokasi: ' + error.message, true);
+                }, { enableHighAccuracy: true });
+            } else { showToast('Browser tidak mendukung GPS', true); }
+        }
+
+        async function handleSaveLocationSettings(e) {
+            e.preventDefault();
+            const latRaw = document.getElementById('set-lat').value.replace(/,/g, '.');
+            const lngRaw = document.getElementById('set-lng').value.replace(/,/g, '.');
+            const radiusRaw = document.getElementById('set-radius').value;
+            const lat = parseFloat(latRaw); const lng = parseFloat(lngRaw); const radius = parseInt(radiusRaw);
+            if(isNaN(lat) || isNaN(lng)) { showToast('Format koordinat tidak valid. Gunakan angka.', true); return; }
+
+            showLoader('Menyimpan pengaturan lokasi...');
+            try {
+                const { error } = await _supabase.from('pengaturan').upsert({ id: 1, lat: String(lat), lng: String(lng), radius: radius });
+                if(error) throw error;
+
+                appSettings.lat = lat; appSettings.lng = lng; appSettings.radius = radius;
+                localStorage.setItem('absen_settings', JSON.stringify(appSettings));
+                showToast('Pengaturan Lokasi Tersimpan');
+            } catch (e) { showToast('Gagal menyimpan', true); } finally { hideLoader(); }
+        }
+
+        // --- FILTER & REKAPAN ABSENSI ---
+        async function loadHistoryData() {
+            showLoader('Memuat riwayat...');
+            try {
+                let query = _supabase.from('riwayat_absen').select('*');
+                if (currentUser.role !== 'admin') {
+                    query = query.eq('username', currentUser.username);
+                }
+                const { data, error } = await query;
+                if(error) throw error;
+
+                allHistoryCache = data || [];
+                populateCategoryFilter(); 
+                
+                if (!document.getElementById('filter-date').value && !document.getElementById('filter-month').value) {
+                    const now = new Date();
+                    const yyyy = now.getFullYear();
+                    const mm = String(now.getMonth() + 1).padStart(2, '0');
+                    const dd = String(now.getDate()).padStart(2, '0');
+                    
+                    if(document.getElementById('filter-type')) document.getElementById('filter-type').value = 'harian';
+                    if(document.getElementById('filter-date')) document.getElementById('filter-date').value = `${yyyy}-${mm}-${dd}`;
+                    toggleFilterType(); 
+                } else {
+                    applyFilters(); 
+                }
+            } catch (e) { showToast('Gagal memuat riwayat', true); } finally { hideLoader(); }
+        }
+
+        function toggleFilterType() {
+            const type = document.getElementById('filter-type').value;
+            if (type === 'harian') {
+                document.getElementById('filter-date-container').classList.remove('hidden-page');
+                document.getElementById('filter-month-container').classList.add('hidden-page');
+            } else {
+                document.getElementById('filter-date-container').classList.add('hidden-page');
+                document.getElementById('filter-month-container').classList.remove('hidden-page');
+            }
+            applyFilters();
+        }
+
+        function populateCategoryFilter() {
+            if (currentUser.role !== 'admin') return;
+            const select = document.getElementById('filter-kategori');
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">Semua Tingkat</option>';
+
+            const uniqueCategories = [...new Set(allHistoryCache.map(h => h.kategori))].filter(k => k && k !== '-');
+
+            uniqueCategories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.innerText = cat;
+                select.appendChild(opt);
+            });
+            if (uniqueCategories.includes(currentVal)) select.value = currentVal;
+        }
+
+        function groupHistoryData(data) {
+            const grouped = {};
+            data.forEach(h => {
+                const formattedFull = formatTanggalGas(h.waktu);
+                const tanggal = formattedFull.split(' ')[0];
+                const waktu = formattedFull.split(' ')[1] || '-';
+                const key = `${tanggal}_${h.username}`;
+
+                if (!grouped[key]) {
+                    grouped[key] = {
+                        tanggal: tanggal,
+                        username: h.username,
+                        nama: h.nama,
+                        kategori: h.kategori,
+                        jamMasuk: '-',
+                        jamPulang: '-',
+                        fotoMasuk: null,
+                        fotoPulang: null,
+                        mapMasuk: null,
+                        mapPulang: null
+                    };
+                }
+
+                if (h.tipe === 'Masuk') {
+                    grouped[key].jamMasuk = waktu;
+                    grouped[key].fotoMasuk = h.foto_url;
+                    grouped[key].mapMasuk = `https://www.google.com/maps?q=${h.lat},${h.lng}`;
+                } else if (h.tipe === 'Pulang') {
+                    grouped[key].jamPulang = waktu;
+                    grouped[key].fotoPulang = h.foto_url;
+                    grouped[key].mapPulang = `https://www.google.com/maps?q=${h.lat},${h.lng}`;
+                }
+            });
+
+            return Object.values(grouped).sort((a, b) => {
+                const dateA = a.tanggal.split('/').reverse().join('');
+                const dateB = b.tanggal.split('/').reverse().join('');
+                if (dateB !== dateA) return dateB.localeCompare(dateA); 
+                return a.nama.localeCompare(b.nama); 
+            });
+        }
+
+        function applyFilters() {
+            let filteredData = [...allHistoryCache];
+            const filterType = document.getElementById('filter-type').value;
+            const filterDate = document.getElementById('filter-date').value; 
+            const filterMonth = document.getElementById('filter-month').value; 
+            const filterKategori = document.getElementById('filter-kategori').value;
+
+            if(filterType === 'harian' && filterDate) {
+                const parts = filterDate.split('-');
+                const targetDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                filteredData = filteredData.filter(h => getTanggalSaja(h.waktu) === targetDate);
+            } else if (filterType === 'bulanan' && filterMonth) {
+                const parts = filterMonth.split('-');
+                const targetMonth = `${parts[1]}/${parts[0]}`;
+                filteredData = filteredData.filter(h => getBulanTahunSaja(h.waktu) === targetMonth);
+            }
+
+            if(filterKategori && filterKategori !== '' && currentUser.role === 'admin') {
+                filteredData = filteredData.filter(h => h.kategori === filterKategori);
+            }
+
+            const groupedData = groupHistoryData(filteredData);
+            renderHistoryTable(groupedData);
+        }
+
+        function resetFilters() {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            
+            document.getElementById('filter-type').value = 'harian';
+            document.getElementById('filter-date').value = `${yyyy}-${mm}-${dd}`;
+            document.getElementById('filter-month').value = '';
+            document.getElementById('filter-kategori').value = '';
+            
+            toggleFilterType();
+        }
+
+        function renderHistoryTable(data) {
+            const tbody = document.getElementById('table-history-body');
+            tbody.innerHTML = '';
+            if(data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400 font-medium">Belum ada data absensi di periode ini.</td></tr>`;
+                return;
+            }
+            data.forEach(h => {
+                const katBadge = h.kategori && h.kategori !== '-' ? `<span class="bg-indigo-50 border border-indigo-100 text-indigo-600 px-2 py-0.5 rounded text-[11px] font-bold tracking-wide">${h.kategori}</span>` : '-';
+                
+                const renderWaktu = (jam, foto, map, typeColor) => {
+                    if(jam === '-') return `<span class="text-slate-300 font-bold">-</span>`;
+                    return `
+                        <div class="flex flex-col items-center">
+                            <span class="font-bold text-slate-700 text-base">${jam}</span>
+                            <div class="flex space-x-2 mt-1 no-print">
+                                <a href="${foto}" target="_blank" class="text-${typeColor}-500 hover:text-${typeColor}-700 bg-${typeColor}-50 p-1 rounded transition-colors" title="Lihat Foto"><i class="fa-solid fa-image"></i></a>
+                                <a href="${map}" target="_blank" class="text-rose-500 hover:text-rose-700 bg-rose-50 p-1 rounded transition-colors" title="Lihat Maps"><i class="fa-solid fa-map-marker-alt"></i></a>
+                            </div>
+                        </div>
+                    `;
+                };
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
+                        <td class="px-6 py-4 text-sm text-slate-600 font-medium">${h.tanggal}</td>
+                        <td class="px-6 py-4 font-bold text-slate-700">${h.nama}</td>
+                        <td class="px-6 py-4">${katBadge}</td>
+                        <td class="px-6 py-4 text-center">${renderWaktu(h.jamMasuk, h.fotoMasuk, h.mapMasuk, 'emerald')}</td>
+                        <td class="px-6 py-4 text-center">${renderWaktu(h.jamPulang, h.fotoPulang, h.mapPulang, 'amber')}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function printHistory() {
+            const printContent = document.getElementById('print-table').outerHTML;
+            
+            const newWin = window.open('', '_blank');
+            newWin.document.write(`
+                <html>
+                <head>
+                    <title>Laporan Data Absensi</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 30px; color: black; }
+                        h2 { text-align: center; font-size: 22px; margin-bottom: 5px; }
+                        p.date { text-align: center; font-size: 14px; margin-top: 0; margin-bottom: 25px; color: #555; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; text-align: center; }
+                        .no-print { display: none !important; }
+                        .text-center { text-align: center; }
+                    </style>
+                </head>
+                <body>
+                    <h2>Laporan Rekapan Absensi Kehadiran</h2>
+                    <p class="date">Dicetak pada: ${new Date().toLocaleString('id-ID')}</p>
+                    ${printContent}
+                    <script>
+                        setTimeout(function() { window.print(); window.close(); }, 500);
+                    <\/script>
+                </body>
+                </html>
+            `);
+            newWin.document.close();
+        }
+
+        // --- MENU PESERTA: LOGIKA ABSENSI ---
+        async function initAbsenForm() {
+            currentPhotoBase64 = null;
+            currentUserLocation = null;
+            
+            document.getElementById('kamera-preview').classList.add('hidden-page');
+            document.getElementById('kamera-video').classList.remove('hidden-page');
+            document.getElementById('btn-snap').disabled = false;
+            document.getElementById('btn-snap').classList.remove('hidden-page');
+            document.getElementById('btn-retake').classList.add('hidden-page');
+            
+            document.getElementById('gps-radius').innerText = `${appSettings.radius} meter`;
+            document.getElementById('gps-target').innerText = `${appSettings.lat}, ${appSettings.lng}`;
+            
+            showLoader('Memeriksa status absen hari ini...');
+            try {
+                const { data: history } = await _supabase.from('riwayat_absen').select('*').eq('username', currentUser.username);
+                const today = getTodayString();
+                const historyToday = history ? history.filter(h => getTanggalSaja(h.waktu) === today) : [];
+                
+                let hasMasuk = historyToday.some(h => h.tipe === 'Masuk');
+                let hasPulang = historyToday.some(h => h.tipe === 'Pulang');
+
+                const optMasuk = document.getElementById('opt-masuk');
+                const optPulang = document.getElementById('opt-pulang');
+                const selectTipe = document.getElementById('absen-tipe');
+                const infoText = document.getElementById('absen-tipe-info');
+                
+                optMasuk.disabled = false; optPulang.disabled = false;
+                infoText.classList.add('hidden-page');
+                document.getElementById('absen-form-container').classList.remove('hidden-page');
+                document.getElementById('absen-lock-message').classList.add('hidden-page');
+
+                if (hasMasuk && hasPulang) {
+                    document.getElementById('absen-form-container').classList.add('hidden-page');
+                    document.getElementById('absen-lock-message').classList.remove('hidden-page');
+                    hideLoader();
+                    return; 
+                } else if (hasMasuk) {
+                    optMasuk.disabled = true;
+                    selectTipe.value = 'Pulang';
+                    infoText.querySelector('span').innerText = "Anda sudah Absen Masuk hari ini. Silakan Absen Pulang.";
+                    infoText.classList.remove('hidden-page');
+                } else if (hasPulang) {
+                    optPulang.disabled = true;
+                    selectTipe.value = 'Masuk';
+                } else {
+                    selectTipe.value = 'Masuk'; 
+                }
+
+                checkSubmitEligibility();
+                startCamera();
+                startGPS();
+            } catch (e) {
+                showToast("Gagal memeriksa status absen", true);
+            } finally {
+                hideLoader();
+            }
+        }
+
+        async function startCamera() {
+            const video = document.getElementById('kamera-video');
+            const errorMsg = document.getElementById('kamera-error');
+            try {
+                streamKamera = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+                video.srcObject = streamKamera;
+                errorMsg.classList.add('hidden-page');
+                document.getElementById('btn-snap').disabled = false;
+            } catch (err) {
+                console.error(err); errorMsg.classList.remove('hidden-page'); document.getElementById('btn-snap').disabled = true;
+            }
+        }
+
+        function stopCamera() { if (streamKamera) { streamKamera.getTracks().forEach(track => track.stop()); streamKamera = null; } }
+
+        function takeSnapshot() {
+            const video = document.getElementById('kamera-video');
+            const canvas = document.getElementById('kamera-canvas');
+            const preview = document.getElementById('kamera-preview');
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            currentPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
+            preview.src = currentPhotoBase64;
+            video.classList.add('hidden-page'); preview.classList.remove('hidden-page');
+            document.getElementById('btn-snap').classList.add('hidden-page'); document.getElementById('btn-retake').classList.remove('hidden-page');
+            stopCamera(); checkSubmitEligibility();
+        }
+
+        function retakeSnapshot() {
+            currentPhotoBase64 = null;
+            document.getElementById('kamera-preview').classList.add('hidden-page'); document.getElementById('kamera-video').classList.remove('hidden-page');
+            document.getElementById('btn-snap').classList.remove('hidden-page'); document.getElementById('btn-retake').classList.add('hidden-page');
+            checkSubmitEligibility(); startCamera();
+        }
+
+        function startGPS() {
+            const statusEl = document.getElementById('gps-status'); const distEl = document.getElementById('gps-distance');
+            if (!("geolocation" in navigator)) { statusEl.innerHTML = '<span class="text-rose-500">GPS Tidak Didukung</span>'; return; }
+            statusEl.innerHTML = 'Mencari... <i class="fa-solid fa-spinner fa-spin ml-1"></i>'; statusEl.className = "font-bold text-amber-500 bg-amber-50 px-2 py-0.5 rounded text-xs";
+            
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = Number(position.coords.latitude); const lng = Number(position.coords.longitude);
+                    currentUserLocation = { lat, lng };
+                    const targetLat = Number(appSettings.lat); const targetLng = Number(appSettings.lng);
+                    const jarak = Math.round(calculateDistance(lat, lng, targetLat, targetLng));
+                    currentUserLocation.jarak = jarak;
+                    distEl.innerText = `${jarak} meter`;
+                    if (jarak <= appSettings.radius) { statusEl.innerHTML = '<span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded text-xs border border-emerald-100"><i class="fa-solid fa-check-circle mr-1"></i> Sesuai Radius</span>'; }
+                    else { statusEl.innerHTML = '<span class="text-rose-600 bg-rose-50 px-2 py-0.5 rounded text-xs border border-rose-100"><i class="fa-solid fa-times-circle mr-1"></i> Di Luar Radius</span>'; }
+                    checkSubmitEligibility();
+                },
+                (error) => {
+                    let errMsg = "GPS Gagal"; if(error.code===1) errMsg="Izin Ditolak"; if(error.code===2) errMsg="Posisi Tidak Tersedia"; if(error.code===3) errMsg="Timeout";
+                    statusEl.innerHTML = `<span class="text-rose-500 bg-rose-50 px-2 py-0.5 rounded text-xs border border-rose-100">${errMsg}</span>`;
+                    checkSubmitEligibility();
+                }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; const p1 = lat1 * Math.PI/180; const p2 = lat2 * Math.PI/180; const dp = (lat2-lat1) * Math.PI/180; const dl = (lon2-lon1) * Math.PI/180;
+            const a = Math.sin(dp/2) * Math.sin(dp/2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl/2) * Math.sin(dl/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); return R * c;
+        }
+
+        function checkSubmitEligibility() {
+            const btnSubmit = document.getElementById('btn-submit-absen'); const warning = document.getElementById('submit-warning');
+            let isPhotoReady = currentPhotoBase64 !== null; let isGpsReady = currentUserLocation !== null;
+            let isWithinRadius = isGpsReady ? (currentUserLocation.jarak <= appSettings.radius) : false;
+
+            if (isPhotoReady && isWithinRadius) {
+                btnSubmit.disabled = false; btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed'); warning.classList.add('hidden-page');
+            } else {
+                btnSubmit.disabled = true; btnSubmit.classList.add('opacity-50', 'cursor-not-allowed'); warning.classList.remove('hidden-page');
+                if(!isPhotoReady) warning.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i> Silakan ambil foto selfie terlebih dahulu.';
+                else if(!isGpsReady) warning.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i> Sedang mendapatkan lokasi GPS...';
+                else if(!isWithinRadius) warning.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Lokasi Anda (${currentUserLocation.jarak}m) di luar radius yang diizinkan (${appSettings.radius}m).`;
+            }
+        }
+
+        // FUNGSI KONVERSI BASE64 KE BLOB (UNTUK UPLOAD SUPABASE STORAGE)
+        function base64ToBlob(base64, mimeType = 'image/jpeg') {
+            const byteCharacters = atob(base64.split(',')[1]);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            return new Blob([byteArray], { type: mimeType });
+        }
+
+        // --- SUBMIT ABSENSI KE SUPABASE ---
+        async function submitAbsensi() {
+            const tipe = document.getElementById('absen-tipe').value;
+            showLoader('Mengunggah Foto & Mengirim Absen...');
+            try {
+                // 1. Upload Foto ke Supabase Storage (Bucket: foto-absen)
+                const fileName = `${currentUser.username}_${Date.now()}.jpg`;
+                const imageBlob = base64ToBlob(currentPhotoBase64, 'image/jpeg');
+
+                const { data: uploadData, error: uploadError } = await _supabase.storage
+                    .from('foto-absen')
+                    .upload(fileName, imageBlob, { contentType: 'image/jpeg', upsert: true });
+
+                if (uploadError) throw new Error('Gagal mengunggah foto: ' + uploadError.message);
+
+                // 2. Dapatkan URL Publik Gambar
+                const { data: publicUrlData } = _supabase.storage
+                    .from('foto-absen')
+                    .getPublicUrl(fileName);
+
+                const publicFotoUrl = publicUrlData.publicUrl;
+
+                // 3. Simpan Data ke Tabel riwayat_absen
+                const newId = "ABS-" + Date.now();
+                const now = new Date();
+                const dd = String(now.getDate()).padStart(2, '0');
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const yyyy = now.getFullYear();
+                const time = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const timeStampStr = `${dd}/${mm}/${yyyy} ${time}`;
+
+                const { error: insertError } = await _supabase
+                    .from('riwayat_absen')
+                    .insert([{
+                        id: newId,
+                        waktu: timeStampStr,
+                        username: currentUser.username,
+                        nama: currentUser.nama,
+                        kategori: currentUser.kategori,
+                        tipe: tipe,
+                        foto_url: publicFotoUrl,
+                        lat: String(currentUserLocation.lat),
+                        lng: String(currentUserLocation.lng),
+                        jarak: currentUserLocation.jarak
+                    }]);
+
+                if (insertError) throw new Error('Gagal menyimpan absensi: ' + insertError.message);
+
+                showToast('Absensi Berhasil Dikirim!');
+                navigateTo('page-history');
+            } catch (e) { 
+                showToast(e.message, true); 
+            } finally { 
+                hideLoader(); 
+            }
+        }
+    </script>
+<script>
+// ===== UTIL =====
+const pad2 = n => String(n).padStart(2, '0');
+const toKey = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+const parseKey = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const $id = id => document.getElementById(id);
+function keyOf(raw) { const p = getTanggalSaja(raw).split('/'); return p.length === 3 ? `${p[2]}-${p[1]}-${p[0]}` : ''; }
+const fmtKey = k => parseKey(k).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+const hhmm = t => (!t || t === '-') ? '-' : t.replace(/\./g, ':').slice(0, 5);
+const tone = p => p == null ? 't-na' : p >= 85 ? 't-ok' : p >= 75 ? 't-mid' : 't-low';
+const MODE_LABEL = { jumsab: 'Jumat & Sabtu', aktif: 'hari ada absensi', semua: 'setiap hari' };
+
+function ring(p, size, arc, track) {
+    const R = 42, C = 2 * Math.PI * R, v = p == null ? 0 : p;
+    return `<svg width="${size}" height="${size}" viewBox="0 0 100 100"><circle cx="50" cy="50" r="${R}" fill="none" stroke="${track}" stroke-width="12"/><circle cx="50" cy="50" r="${R}" fill="none" stroke="${arc}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C * v / 100} ${C}" transform="rotate(-90 50 50)"/><text x="50" y="58" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="24" fill="currentColor">${p == null ? '-' : p + '%'}</text></svg>`;
+}
+
+async function fetchAll(mk) { // Supabase membatasi 1000 baris per permintaan
+    let out = [], from = 0;
+    for (;;) {
+        const { data, error } = await mk().range(from, from + 999);
+        if (error) throw error;
+        out = out.concat(data || []);
+        if (!data || data.length < 1000) break;
+        from += 1000;
+    }
+    return out;
+}
+
+// ===== STATE REKAP =====
+let rosterCache = [], rekapTab = 'persen', curPage = '';
+const activeDates = new Set(), activeMonths = new Set();
+
+// Tanggal "hari efektif" = tanggal saat ada yang absen masuk
+async function ensureActive(sKey, eKey) {
+    const months = [], e = parseKey(eKey.slice(0, 7) + '-01');
+    for (let d = parseKey(sKey.slice(0, 7) + '-01'); d <= e; d.setMonth(d.getMonth() + 1)) months.push(toKey(d).slice(0, 7));
+    const cur = toKey(new Date()).slice(0, 7);
+    const need = months.filter(m => m === cur || !activeMonths.has(m));
+    if (!need.length) return;
+    const base = () => _supabase.from('riwayat_absen').select('id,waktu').eq('tipe', 'Masuk').order('id');
+    let rows;
+    try {
+        rows = await fetchAll(() => need.length <= 24
+            ? base().or(need.map(m => { const [y, mm] = m.split('-'); return `waktu.like.*/${mm}/${y}*`; }).join(',')) : base());
+    } catch (err) { rows = await fetchAll(base); }
+    rows.forEach(h => { const k = keyOf(h.waktu); if (k) activeDates.add(k); });
+    need.forEach(m => activeMonths.add(m));
+}
+
+function getRange() {
+    const t = $id('filter-type').value, today = toKey(new Date());
+    let s, e;
+    if (t === 'harian') { s = e = $id('filter-date').value || today; }
+    else if (t === 'bulanan') {
+        const m = $id('filter-month').value || today.slice(0, 7);
+        s = m + '-01'; const d = parseKey(s); d.setMonth(d.getMonth() + 1); d.setDate(0); e = toKey(d);
+    } else {
+        s = $id('filter-from').value || today.slice(0, 7) + '-01'; e = $id('filter-to').value || today;
+        if (s > e) [s, e] = [e, s];
+    }
+    return { s, e };
+}
+
+function effectiveDays(r, mode) {
+    const end = r.e > toKey(new Date()) ? toKey(new Date()) : r.e, out = [];
+    for (let d = parseKey(r.s); toKey(d) <= end; d.setDate(d.getDate() + 1)) {
+        const k = toKey(d), w = d.getDay();
+        if (holidayOf(k)) continue;
+        if (mode === 'semua' || (mode === 'jumsab' && (w === 5 || w === 6)) || (mode === 'aktif' && activeDates.has(k))) out.push(k);
+    }
+    return out;
+}
+
+function computeRekap() {
+    const r = getRange(), mode = $id('filter-mode').value, kat = $id('filter-kategori').value;
+    const days = effectiveDays(r, mode), ds = new Set(days), idx = {};
+    allHistoryCache.forEach(h => { if (!ds.has(h._k)) return; const u = idx[h.username] = idx[h.username] || {}; (u[h._k] = u[h._k] || {})[h.tipe] = 1; });
+    const list = rosterCache.filter(u => !kat || u.kategori === kat).map(u => {
+        const m = idx[u.username] || {};
+        const hadir = days.filter(k => m[k] && m[k].Masuk).length;
+        const lengkap = days.filter(k => m[k] && m[k].Masuk && m[k].Pulang).length;
+        return { ...u, m, hadir, lengkap, persen: days.length ? Math.round(hadir / days.length * 100) : null };
+    });
+    return { r, mode, days, list };
+}
+
+// ===== NAVIGASI (BOTTOM BAR) =====
+const NAV = {
+    admin: [
+        { page: 'page-admin-dashboard', icon: 'fa-house', label: 'Beranda' },
+        { page: 'page-admin-users', icon: 'fa-users', label: 'Peserta' },
+        { fab: 1, page: 'page-history', icon: 'fa-chart-pie', label: 'Rekap' },
+        { page: 'page-admin-settings', icon: 'fa-gear', label: 'Pengaturan' },
+        { page: 'page-profile', icon: 'fa-user', label: 'Akun' }
+    ],
+    mhs: [
+        { page: 'page-user-dashboard', icon: 'fa-house', label: 'Beranda' },
+        { page: 'page-history', tab: 'detail', icon: 'fa-clock-rotate-left', label: 'Riwayat' },
+        { fab: 1, page: 'page-user-absen', icon: 'fa-camera', label: 'Absen' },
+        { page: 'page-history', tab: 'persen', icon: 'fa-chart-pie', label: 'Persentase' },
+        { page: 'page-profile', icon: 'fa-user', label: 'Akun' }
+    ]
+};
+
+function renderNav() {
+    if (!currentUser) return;
+    $id('bottom-nav').innerHTML = NAV[currentUser.role === 'admin' ? 'admin' : 'mhs'].map(it => {
+        const act = it.page === curPage && (!it.tab || it.tab === rekapTab);
+        const go = `navigateTo('${it.page}'${it.tab ? `,'${it.tab}'` : ''})`;
+        return it.fab
+            ? `<div class="fab-cell"><button class="nav-fab" onclick="${go}" aria-label="${it.label}"><i class="fa-solid ${it.icon}"></i></button><span>${it.label}</span></div>`
+            : `<button class="nav-item ${act ? 'active' : ''}" onclick="${go}"><i class="fa-solid ${it.icon}"></i><span>${it.label}</span></button>`;
+    }).join('');
+}
+
+function navigateTo(pageId, tab) {
+    ['page-login', 'page-admin-dashboard', 'page-admin-users', 'page-history', 'page-admin-settings', 'page-user-dashboard', 'page-user-absen', 'page-profile']
+        .forEach(p => { const el = $id(p); if (el) el.classList.add('hidden-page'); });
+    $id(pageId).classList.remove('hidden-page');
+    $id('layout-main').classList.toggle('hidden-page', pageId === 'page-login');
+    curPage = pageId;
+    if (tab) rekapTab = tab;
+    if (pageId !== 'page-user-absen') { stopCamera(); stopGPS(); }
+    if (pageId === 'page-admin-dashboard') loadAdminDashboardStats();
+    if (pageId === 'page-user-dashboard') loadUserDashboardStats();
+    if (pageId === 'page-admin-users') loadUsersData();
+    if (pageId === 'page-admin-settings') { populateLocationSettingsForm(); loadHolidays(true).then(renderHolidays); }
+    if (pageId === 'page-user-absen') initAbsenForm();
+    if (pageId === 'page-history') { initRekapDefaults(); loadHistoryData(); setRekapTab(rekapTab); }
+    renderNav();
+    const admin = currentUser && currentUser.role === 'admin';
+    const titles = { 'page-admin-dashboard': 'Beranda', 'page-admin-users': 'Kelola Peserta', 'page-admin-settings': 'Pengaturan', 'page-user-dashboard': 'Beranda', 'page-user-absen': 'Absen Selfie', 'page-profile': 'Akun' };
+    $id('mobile-header-title').innerText = pageId === 'page-history' ? (rekapTab === 'persen' ? 'Persentase Kehadiran' : (admin ? 'Rekap Absensi' : 'Riwayat Saya')) : (titles[pageId] || 'Absensi');
+    $id('main-content').scrollTo(0, 0);
+}
+
+function setupUserInterface() {
+    const admin = currentUser.role === 'admin';
+    $id('topbar-user').innerText = 'Halo, ' + currentUser.nama;
+    $id('topbar-av').innerText = (currentUser.nama || '?').trim().charAt(0).toUpperCase();
+    $id('prof-name').innerText = currentUser.nama;
+    $id('prof-initial').innerText = (currentUser.nama || '?').trim().charAt(0).toUpperCase();
+    $id('prof-role').innerText = admin ? 'Administrator' : 'Mahasiswa';
+    const kat = $id('prof-kat');
+    if (!admin && currentUser.kategori && currentUser.kategori !== '-') { kat.innerText = currentUser.kategori; kat.classList.remove('hidden-page'); } else kat.classList.add('hidden-page');
+    $id('admin-filter-kategori-container').classList.toggle('hidden-page', !admin);
+    if (admin) $id('admin-welcome-name').innerText = currentUser.nama; else $id('welcome-name').innerText = currentUser.nama;
+    loadHolidays();
+    curPage = '';
+    navigateTo(admin ? 'page-admin-dashboard' : 'page-user-dashboard');
+}
+
+// ===== REKAP =====
+function initRekapDefaults() {
+    const now = new Date(), today = toKey(now);
+    if (!$id('filter-month').value) $id('filter-month').value = today.slice(0, 7);
+    if (!$id('filter-date').value) $id('filter-date').value = today;
+    if (!$id('filter-from').value) $id('filter-from').value = today.slice(0, 7) + '-01';
+    if (!$id('filter-to').value) $id('filter-to').value = today;
+    setPeriod($id('filter-type').value, true);
+}
+
+function setPeriod(t, silent) {
+    $id('filter-type').value = t;
+    document.querySelectorAll('#seg-periode button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+    $id('filter-date-container').classList.toggle('hidden-page', t !== 'harian');
+    $id('filter-month-container').classList.toggle('hidden-page', t !== 'bulanan');
+    $id('filter-range-container').classList.toggle('hidden-page', t !== 'rentang');
+    if (!silent) applyFilters();
+}
+function toggleFilterType() { setPeriod($id('filter-type').value); }
+
+function quickRange(n) {
+    const now = new Date(); let s, e = toKey(now);
+    if (n === 'lalu') { s = toKey(new Date(now.getFullYear(), now.getMonth() - 1, 1)); e = toKey(new Date(now.getFullYear(), now.getMonth(), 0)); }
+    else { const d = new Date(now); d.setDate(d.getDate() - (n - 1)); s = toKey(d); }
+    $id('filter-from').value = s; $id('filter-to').value = e;
+    setPeriod('rentang');
+}
+
+function setRekapTab(t) {
+    rekapTab = t;
+    document.querySelectorAll('#seg-tab button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+    $id('rekap-persen').classList.toggle('hidden-page', t !== 'persen');
+    $id('rekap-detail').classList.toggle('hidden-page', t !== 'detail');
+    $id('mode-container').classList.toggle('hidden-page', t !== 'persen');
+    renderNav();
+    if (curPage === 'page-history') {
+        const admin = currentUser.role === 'admin';
+        $id('mobile-header-title').innerText = t === 'persen' ? 'Persentase Kehadiran' : (admin ? 'Rekap Absensi' : 'Riwayat Saya');
+    }
+}
+
+async function loadHistoryData() {
+    showLoader('Memuat rekap...');
+    try {
+        const admin = currentUser.role === 'admin';
+        allHistoryCache = await fetchAll(() => { const q = _supabase.from('riwayat_absen').select('*').order('id'); return admin ? q : q.eq('username', currentUser.username); });
+        allHistoryCache.forEach(h => h._k = keyOf(h.waktu));
+        rosterCache = admin
+            ? await fetchAll(() => _supabase.from('pengguna').select('username,nama,kategori').neq('role', 'admin').order('nama').order('username'))
+            : [currentUser];
+        if (admin) {
+            const sel = $id('filter-kategori'), cur = sel.value;
+            const cats = [...new Set(rosterCache.map(u => u.kategori))].filter(k => k && k !== '-');
+            sel.innerHTML = '<option value="">Semua Tingkat</option>' + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+            if (cats.includes(cur)) sel.value = cur;
+        }
+        await applyFilters();
+    } catch (e) { console.error(e); showToast('Gagal memuat rekap', true); } finally { hideLoader(); }
+}
+
+async function applyFilters() {
+    if (!currentUser) return;
+    const r = getRange();
+    try { await loadHolidays(); } catch (e) { console.error(e); }
+    renderPersen();
+    const kat = $id('filter-kategori').value;
+    const rows = allHistoryCache.filter(h => h._k >= r.s && h._k <= r.e && (!kat || h.kategori === kat));
+    renderHistoryTable(groupHistoryData(rows));
+}
+
+function resetFilters() {
+    ['filter-date', 'filter-month', 'filter-from', 'filter-to'].forEach(i => $id(i).value = '');
+    $id('filter-kategori').value = ''; $id('filter-mode').value = 'jumsab';
+    initRekapDefaults(); setPeriod('bulanan');
+}
+
+function periodLabel(r) { return r.s === r.e ? fmtKey(r.s) : `${fmtKey(r.s)} \u2013 ${fmtKey(r.e)}`; }
+
+function renderPersen() {
+    const { r, mode, days, list } = computeRekap(), box = $id('rekap-persen'), admin = currentUser.role === 'admin';
+    if (!days.length) { box.innerHTML = '<div class="empty">Belum ada hari efektif di periode ini.<br><small>Ubah periode atau pilihan "Hitung persentase dari".</small></div>'; return; }
+    const sub = `${days.length} hari efektif (${MODE_LABEL[mode]})`;
+    if (!admin) {
+        const u = list[0] || { hadir: 0, lengkap: 0, persen: null, m: {} };
+        const ok = u.persen != null && u.persen >= 75;
+        const rows = days.slice().reverse().slice(0, 60).map(k => {
+            const x = u.m[k], st = x && x.Masuk ? (x.Pulang ? ['Lengkap', 't-ok'] : ['Belum pulang', 't-mid']) : ['Tidak hadir', 't-low'];
+            return `<div class="row"><div class="mid"><b>${fmtKey(k)}</b></div><span class="pill ${st[1]}">${st[0]}</span></div>`;
+        }).join('');
+        box.innerHTML = `
+        <div class="card-pine rounded-2xl p-5 flex items-center gap-4 shadow-md"><div class="shrink-0">${ring(u.persen, 104, '#FFC960', 'rgba(255,255,255,.3)')}</div>
+            <div><p class="font-display font-bold text-lg leading-tight">Kehadiran Anda</p><p class="text-sm opacity-80 mt-1">${esc(periodLabel(r))}</p><p class="text-sm mt-2">${u.hadir} dari ${days.length} hari efektif</p></div></div>
+        <div class="rounded-2xl p-4 flex items-center justify-between" style="background:linear-gradient(150deg,#FFB43C,#F2A22D 55%,#FFD38A);color:#3A2400"><div><small class="font-bold opacity-80">Status kehadiran</small><p class="font-display font-bold text-lg">${ok ? 'Memenuhi batas 75%' : 'Di bawah batas 75%'}</p></div><div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-xl" style="color:${ok ? '#1F7A55' : '#B23B2B'}"><i class="fa-solid ${ok ? 'fa-check' : 'fa-triangle-exclamation'}"></i></div></div>
+        <div class="grid grid-cols-3 gap-3"><div class="tile"><b>${u.hadir}</b><small>Hadir</small></div><div class="tile"><b>${u.lengkap}</b><small>Masuk + Pulang</small></div><div class="tile"><b>${days.length - u.hadir}</b><small>Tidak hadir</small></div></div>
+        <p class="font-display font-bold pt-2">Rincian per hari</p><div class="space-y-2">${rows}</div>`;
+        return;
+    }
+    const ps = list.filter(u => u.persen != null), avg = ps.length ? Math.round(ps.reduce((a, u) => a + u.persen, 0) / ps.length) : null;
+    const low = ps.filter(u => u.persen < 75).length;
+    const items = list.slice().sort((a, b) => (a.persen ?? -1) - (b.persen ?? -1) || a.nama.localeCompare(b.nama)).map(u => `
+        <div class="row"><div class="mid"><b>${esc(u.nama)}</b><small>${esc(u.kategori || '-')} \u00b7 hadir ${u.hadir}/${days.length} \u00b7 lengkap ${u.lengkap}</small><div class="bar"><i style="width:${u.persen || 0}%"></i></div></div><span class="pill ${tone(u.persen)}">${u.persen == null ? '-' : u.persen + '%'}</span></div>`).join('');
+    box.innerHTML = `
+        <div class="card-pine rounded-2xl p-5 flex items-center gap-4 shadow-md"><div class="shrink-0">${ring(avg, 104, '#FFC960', 'rgba(255,255,255,.3)')}</div>
+            <div><p class="font-display font-bold text-lg leading-tight">Rata-rata kehadiran</p><p class="text-sm opacity-80 mt-1">${esc(periodLabel(r))}</p><p class="text-sm mt-2">${sub}</p></div></div>
+        <div class="grid grid-cols-3 gap-3"><div class="tile"><b>${list.length}</b><small>Mahasiswa</small></div><div class="tile"><b>${ps.length - low}</b><small>Memenuhi 75%</small></div><div class="tile"><b style="color:#B23B2B">${low}</b><small>Di bawah 75%</small></div></div>
+        <p class="font-display font-bold pt-2">Per mahasiswa <small class="text-slate-500 font-semibold">(terendah dulu)</small></p><div class="space-y-2">${items || '<div class="empty">Belum ada mahasiswa.</div>'}</div>`;
+}
+
+function renderHistoryTable(data) {
+    const box = $id('table-history-body'), admin = currentUser.role === 'admin';
+    if (!data.length) { box.innerHTML = '<div class="empty">Belum ada data absensi di periode ini.</div>'; return; }
+    const lk = (u, ic) => u ? `<a href="${esc(u)}" target="_blank" rel="noopener"><i class="fa-solid ${ic}"></i></a>` : '';
+    const cell = (l, j, f, m) => `<div class="tm"><small>${l}</small><b>${hhmm(j)}</b>${j === '-' ? '' : lk(f, 'fa-image') + lk(m, 'fa-location-dot')}</div>`;
+    box.innerHTML = data.slice(0, 200).map(h => {
+        const [dd, mm, yy] = h.tanggal.split('/');
+        const main = admin ? `<b>${esc(h.nama)}</b><small>${esc(h.kategori && h.kategori !== '-' ? h.kategori : '-')}</small>` : `<b>${fmtKey(`${yy}-${mm}-${dd}`)}</b>`;
+        return `<div class="row"><div class="dchip"><span style="font-size:16px">${dd}</span><span style="font-size:10px">${mm}/${yy.slice(2)}</span></div><div class="mid">${main}</div>${cell('Masuk', h.jamMasuk, h.fotoMasuk, h.mapMasuk)}${cell('Pulang', h.jamPulang, h.fotoPulang, h.mapPulang)}</div>`;
+    }).join('') + (data.length > 200 ? `<div class="empty">Menampilkan 200 dari ${data.length} baris. Persempit filter atau tekan Cetak untuk data lengkap.</div>` : '');
+}
+
+function printHistory() {
+    const { r, mode, days, list } = computeRekap(), kat = $id('filter-kategori').value;
+    let title, thead, rows;
+    if (rekapTab === 'persen') {
+        title = 'Rekap Persentase Kehadiran';
+        thead = '<tr><th>No</th><th>Nama</th><th>Tingkat</th><th>Hadir</th><th>Masuk+Pulang</th><th>Tidak Hadir</th><th>Persentase</th></tr>';
+        rows = list.map((u, i) => `<tr><td>${i + 1}</td><td>${esc(u.nama)}</td><td>${esc(u.kategori || '-')}</td><td>${u.hadir}</td><td>${u.lengkap}</td><td>${days.length - u.hadir}</td><td>${u.persen == null ? '-' : u.persen + '%'}</td></tr>`).join('');
+    } else {
+        title = 'Laporan Rekapan Absensi Kehadiran';
+        thead = '<tr><th>Tanggal</th><th>Nama</th><th>Tingkat</th><th>Jam Masuk</th><th>Jam Pulang</th></tr>';
+        const data = groupHistoryData(allHistoryCache.filter(h => h._k >= r.s && h._k <= r.e && (!kat || h.kategori === kat)));
+        rows = data.map(h => `<tr><td>${h.tanggal}</td><td>${esc(h.nama)}</td><td>${esc(h.kategori || '-')}</td><td>${hhmm(h.jamMasuk)}</td><td>${hhmm(h.jamPulang)}</td></tr>`).join('');
+    }
+    const info = `Periode: ${periodLabel(r)}${kat ? ' \u00b7 Tingkat: ' + esc(kat) : ''}${rekapTab === 'persen' ? ` \u00b7 ${days.length} hari efektif (${MODE_LABEL[mode]})` : ''}`;
+    const w = window.open('', '_blank');
+    w.document.write(`<html><head><title>${title}</title><style>body{font-family:Arial,sans-serif;margin:30px;color:#000}h2{text-align:center;margin-bottom:4px}p{text-align:center;font-size:13px;color:#555;margin:2px 0 18px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid #ddd;padding:7px;text-align:left}th{background:#f2f2f2;text-align:center}</style></head><body><h2>${title}</h2><p>${info}<br>Dicetak: ${new Date().toLocaleString('id-ID')}</p><table><thead>${thead}</thead><tbody>${rows || '<tr><td colspan="7">Tidak ada data</td></tr>'}</tbody></table><script>setTimeout(function(){window.print();window.close();},500);<\/script></body></html>`);
+    w.document.close();
+}
+
+// ===== DASHBOARD =====
+async function loadAdminDashboardStats() {
+    try {
+        const head = (t, f) => { let q = _supabase.from(t).select('id', { count: 'exact', head: true }); return f ? f(q) : q; };
+        const [tp, tr] = await Promise.all([
+            _supabase.from('pengguna').select('username', { count: 'exact', head: true }).neq('role', 'admin'),
+            head('riwayat_absen')
+        ]);
+        $id('stat-total-peserta').innerText = tp.count || 0;
+        $id('stat-total-riwayat').innerText = tr.count || 0;
+        const today = getTodayString();
+        const t = await head('riwayat_absen', q => q.like('waktu', today + '%'));
+        let n = t.count || 0;
+        if (t.error) n = (await fetchAll(() => _supabase.from('riwayat_absen').select('id,waktu').order('id'))).filter(h => getTanggalSaja(h.waktu) === today).length;
+        $id('stat-absen-today').innerText = n;
+    } catch (e) { console.error(e); }
+}
+
+async function loadUserDashboardStats() {
+    try {
+        const h = await fetchAll(() => _supabase.from('riwayat_absen').select('waktu,tipe').eq('username', currentUser.username).order('id'));
+        const tm = getThisMonthString(), masuk = {};
+        let b = 0, m = 0, p = 0;
+        h.forEach(x => {
+            if (x.tipe === 'Masuk') { m++; masuk[keyOf(x.waktu)] = 1; }
+            if (x.tipe === 'Pulang') p++;
+            if (getBulanTahunSaja(x.waktu) === tm) b++;
+        });
+        $id('user-stat-bulan').innerText = b; $id('user-stat-masuk').innerText = m; $id('user-stat-pulang').innerText = p;
+        const now = new Date(), s = toKey(new Date(now.getFullYear(), now.getMonth(), 1)), e = toKey(now);
+        await loadHolidays();
+        const days = effectiveDays({ s, e }, 'jumsab'), hadir = days.filter(k => masuk[k]).length;
+        $id('user-ring').innerHTML = ring(days.length ? Math.round(hadir / days.length * 100) : null, 96, '#FFC960', 'rgba(255,255,255,.3)');
+        $id('user-ring-text').innerText = days.length ? `${hadir} dari ${days.length} hari efektif` : 'Belum ada hari efektif bulan ini';
+    } catch (e) { console.error(e); }
+}
+
+// ===== GPS TAHAN TIMEOUT =====
+// 1) lokasi cepat dari jaringan/cache, 2) GPS akurat via watchPosition, 3) cadangan jaringan jika semua gagal
+let geoCtl = null;
+function stopGPS() { if (geoCtl) { geoCtl.stop(); geoCtl = null; } }
+
+function startLocating(o) {
+    const geo = navigator.geolocation;
+    if (!geo) { setTimeout(() => o.onFail({ code: 0 }), 0); return { stop() {} }; }
+    let best = null, stopped = false, finished = false, watchId = null, lastErr = null;
+    const clear = () => { if (watchId !== null) geo.clearWatch(watchId); watchId = null; clearTimeout(timer); };
+    const accept = pos => {
+        if (stopped || finished) return;
+        if (!best || pos.coords.accuracy <= best.coords.accuracy || pos.timestamp - best.timestamp > 20000) best = pos;
+        o.onUpdate(best);
+        if (best.coords.accuracy <= (o.goodEnough || 25)) { finished = true; clear(); o.onDone(best); }
+    };
+    const fail = err => { lastErr = err; if (err.code === 1 && !finished && !stopped) { finished = true; clear(); o.onFail(err); } };
+    const conclude = () => {
+        if (stopped || finished) return;
+        finished = true; clear();
+        if (best) return o.onDone(best);
+        geo.getCurrentPosition(p => { if (!stopped) { o.onUpdate(p); o.onDone(p); } }, e => { if (!stopped) o.onFail(e || lastErr); },
+            { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 });
+    };
+    const timer = setTimeout(conclude, o.maxWait || 40000);
+    geo.getCurrentPosition(accept, fail, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
+    watchId = geo.watchPosition(accept, fail, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+    return { stop() { stopped = true; clear(); } };
+}
+
+function gpsMsg(e) {
+    let t = ({
+        0: 'Perangkat atau browser tidak mendukung GPS.',
+        1: 'Izin lokasi ditolak. Aktifkan izin lokasi untuk situs ini di pengaturan browser.',
+        2: 'Posisi tidak tersedia. Nyalakan GPS/Lokasi di perangkat.',
+        3: 'Sinyal GPS lemah dan waktu pencarian habis. Pindah ke dekat jendela atau area terbuka.'
+    })[e && e.code] || 'GPS gagal membaca lokasi.';
+    if (!window.isSecureContext) t += ' Lokasi hanya bisa dipakai lewat alamat HTTPS.';
+    else if (window.top !== window.self) t += ' Jika aplikasi tampil di dalam halaman lain (embed), buka lewat tautan langsung aplikasi.';
+    return t + ' Lalu tekan "Cari ulang GPS".';
+}
+
+function gpsBadge(kind, text) {
+    const c = { wait: 'text-amber-600 bg-amber-50', ok: 'text-emerald-700 bg-emerald-50', bad: 'text-rose-600 bg-rose-50' }[kind];
+    $id('gps-status').className = `font-bold px-2 py-0.5 rounded text-xs ${c}`;
+    $id('gps-status').innerHTML = text;
+}
+
+async function refreshSettings() {
+    try {
+        const { data } = await _supabase.from('pengaturan').select('*').eq('id', 1).single();
+        if (!data) return;
+        appSettings = { lat: parseFloat(String(data.lat).replace(/,/g, '.')), lng: parseFloat(String(data.lng).replace(/,/g, '.')), radius: parseInt(data.radius) };
+        localStorage.setItem('absen_settings', JSON.stringify(appSettings));
+        $id('gps-radius').innerText = `${appSettings.radius} meter`;
+        $id('gps-target').innerText = `${appSettings.lat}, ${appSettings.lng}`;
+    } catch (e) { /* pakai pengaturan tersimpan */ }
+}
+
+function applyFix(p, final) {
+    const lat = p.coords.latitude, lng = p.coords.longitude, acc = Math.round(p.coords.accuracy || 0);
+    const jarak = Math.round(calculateDistance(lat, lng, Number(appSettings.lat), Number(appSettings.lng)));
+    currentUserLocation = { lat, lng, jarak, acc };
+    $id('gps-distance').innerText = `${jarak} meter`;
+    $id('gps-accuracy').innerText = `\u00b1 ${acc} m`;
+    const inside = jarak <= appSettings.radius, more = final ? '' : ' \u00b7 menyempurnakan...';
+    gpsBadge(inside ? 'ok' : 'bad', (inside ? '<i class="fa-solid fa-check-circle mr-1"></i> Sesuai Radius' : '<i class="fa-solid fa-times-circle mr-1"></i> Di Luar Radius') + more);
+    checkSubmitEligibility();
+    if (final) {
+        $id('btn-gps-retry').classList.remove('hidden-page');
+        const help = $id('gps-help');
+        if (!inside && acc > appSettings.radius) { help.innerText = `Akurasi GPS rendah (\u00b1 ${acc} m). Pindah ke area terbuka lalu cari ulang.`; help.classList.remove('hidden-page'); }
+    }
+}
+
+function startGPS() {
+    stopGPS(); currentUserLocation = null;
+    $id('gps-help').classList.add('hidden-page'); $id('btn-gps-retry').classList.add('hidden-page');
+    $id('gps-distance').innerText = '-'; $id('gps-accuracy').innerText = '-';
+    gpsBadge('wait', 'Mencari... <i class="fa-solid fa-spinner fa-spin ml-1"></i>');
+    refreshSettings();
+    geoCtl = startLocating({
+        onUpdate: p => applyFix(p, false),
+        onDone: p => applyFix(p, true),
+        onFail: e => {
+            gpsBadge('bad', e && e.code === 1 ? 'Izin Ditolak' : e && e.code === 3 ? 'Timeout' : 'GPS Gagal');
+            const help = $id('gps-help'); help.innerText = gpsMsg(e); help.classList.remove('hidden-page');
+            $id('btn-gps-retry').classList.remove('hidden-page');
+            checkSubmitEligibility();
+            $id('submit-warning').innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i> Lokasi belum didapat. Tekan "Cari ulang GPS".';
+        }
+    });
+}
+
+function getCurrentLocationForAdmin() {
+    showToast('Mencari lokasi... tunggu sampai akurasi membaik');
+    const fill = p => { $id('set-lat').value = p.coords.latitude.toFixed(6); $id('set-lng').value = p.coords.longitude.toFixed(6); };
+    startLocating({
+        goodEnough: 20, maxWait: 25000,
+        onUpdate: fill,
+        onDone: p => { fill(p); showToast(`Lokasi terisi (akurasi \u00b1 ${Math.round(p.coords.accuracy)} m)`); },
+        onFail: e => showToast(gpsMsg(e), true)
+    });
+}
+
+function logout() {
+    stopGPS(); stopCamera();
+    currentUser = null;
+    $id('login-username').value = ''; $id('login-password').value = '';
+    localStorage.removeItem('absen_user'); localStorage.removeItem('absen_settings');
+    navigateTo('page-login');
+}
+
+
+// ===== HARI LIBUR & JADWAL JUMAT-SABTU =====
+// Disimpan di tabel "pengaturan" baris id=2 (kolom lat berisi JSON), jadi tidak perlu membuat tabel baru
+let holidays = [], holidaysLoaded = false;
+const holidayOf = k => holidays.find(h => k >= h.s && k <= h.e);
+
+async function loadHolidays(force) {
+    if (holidaysLoaded && !force) return;
+    try {
+        const { data, error } = await _supabase.from('pengaturan').select('lat').eq('id', 2).maybeSingle();
+        if (error) throw error;
+        const arr = data ? JSON.parse(data.lat) : [];
+        holidays = Array.isArray(arr) ? arr : []; holidaysLoaded = true;
+    } catch (e) { console.error('Hari libur gagal dimuat', e); }
+}
+
+async function saveHolidays() {
+    const { error } = await _supabase.from('pengaturan').upsert({ id: 2, lat: JSON.stringify(holidays), lng: '-', radius: 0 });
+    if (error) throw error;
+}
+
+function renderHolidays() {
+    const box = $id('libur-list');
+    if (!box) return;
+    box.innerHTML = holidays.length ? holidays.map((h, i) => `<div class="row"><div class="mid"><b>${esc(h.ket)}</b><small>${h.s === h.e ? fmtKey(h.s) : fmtKey(h.s) + ' \u2013 ' + fmtKey(h.e)}</small></div><button class="btn bg-rose-50 text-rose-500 border border-rose-100" onclick="deleteHoliday(${i})" title="Hapus"><i class="fa-solid fa-trash"></i></button></div>`).join('')
+        : '<div class="empty">Belum ada hari libur.</div>';
+}
+
+async function addHoliday(ev) {
+    ev.preventDefault();
+    let s = $id('libur-from').value, e = $id('libur-to').value || s;
+    if (s > e) [s, e] = [e, s];
+    const before = holidays.slice();
+    holidays = [...holidays, { s, e, ket: $id('libur-ket').value.trim() }].sort((a, b) => a.s.localeCompare(b.s));
+    showLoader('Menyimpan hari libur...');
+    try { await saveHolidays(); ev.target.reset(); showToast('Hari libur ditambahkan'); }
+    catch (err) { holidays = before; console.error(err); showToast('Gagal menyimpan hari libur', true); }
+    finally { hideLoader(); renderHolidays(); }
+}
+
+async function deleteHoliday(i) {
+    if (!confirm('Hapus hari libur ini?')) return;
+    const before = holidays.slice();
+    holidays.splice(i, 1);
+    showLoader('Menghapus...');
+    try { await saveHolidays(); showToast('Hari libur dihapus'); }
+    catch (err) { holidays = before; showToast('Gagal menghapus', true); }
+    finally { hideLoader(); renderHolidays(); }
+}
+
+function absenBlockReason() {
+    const now = new Date(), k = toKey(now), w = now.getDay(), h = holidayOf(k);
+    if (h) return `Hari ini libur: ${h.ket}.`;
+    if (w !== 5 && w !== 6) return 'Absensi hanya dibuka pada hari Jumat dan Sabtu.';
+    return '';
+}
+
+const _origInitAbsen = initAbsenForm, _origSubmit = submitAbsensi;
+window.initAbsenForm = async function () {
+    await loadHolidays();
+    const msg = absenBlockReason(), box = $id('absen-closed');
+    if (msg) {
+        stopCamera(); stopGPS();
+        $id('absen-closed-msg').innerText = msg;
+        box.classList.remove('hidden-page');
+        $id('absen-form-container').classList.add('hidden-page');
+        $id('absen-lock-message').classList.add('hidden-page');
+        return;
+    }
+    box.classList.add('hidden-page');
+    return _origInitAbsen();
+};
+window.submitAbsensi = async function () {
+    const msg = absenBlockReason();
+    if (msg) { showToast(msg, true); return; }
+    return _origSubmit();
+};
+
+// ===== SELFIE MIRROR (pratinjau dan hasil foto) =====
+function takeSnapshot() {
+    const v = $id('kamera-video'), c = $id('kamera-canvas'), pv = $id('kamera-preview');
+    c.width = v.videoWidth; c.height = v.videoHeight;
+    const x = c.getContext('2d'); x.translate(c.width, 0); x.scale(-1, 1); x.drawImage(v, 0, 0, c.width, c.height);
+    currentPhotoBase64 = c.toDataURL('image/jpeg', 0.6); pv.src = currentPhotoBase64;
+    v.classList.add('hidden-page'); pv.classList.remove('hidden-page');
+    $id('btn-snap').classList.add('hidden-page'); $id('btn-retake').classList.remove('hidden-page');
+    stopCamera(); checkSubmitEligibility();
+}
+
+function togglePw() {
+    const i = $id('login-password'), show = i.type === 'password';
+    i.type = show ? 'text' : 'password';
+    $id('pw-eye').className = show ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
+}
+
+function updateClock() {
+    const el = $id('clk-hm');
+    if (!el) return;
+    const n = new Date();
+    el.innerText = `${pad2(n.getHours())}:${pad2(n.getMinutes())}`;
+    $id('clk-s').innerText = pad2(n.getSeconds());
+    $id('clk-date').innerText = n.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const msg = absenBlockReason(), st = $id('clk-status');
+    st.className = 'pill ' + (msg ? 't-mid' : 't-ok');
+    st.innerText = msg ? (msg.startsWith('Hari ini libur') ? msg.replace(/\.$/, '') : 'Absensi dibuka Jumat & Sabtu') : 'Absensi dibuka hari ini';
+}
+
+</script>
+</body>
+</html>
